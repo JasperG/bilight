@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Bilight</string>
+
+    <string name="ipaddress_hostname">IP address / Hostname</string>
+    <string name="connect">Connect</string>
+    <string name="local_devices">Local Devices</string>
+    <string name="remote_devices">Remote Devices</string>
+    <string name="add_remote_device">Add Remote Device</string>
+    <string name="add_remote_device_summary">Specify an IP address and Port to connect to a Milight device remotely.</string>
+    <string name="remote_instructions">To use this, you need to forward incoming UDP packets on your router to the local IP address of your Milight iBox1 or iBox2 at port 5987.\nFor now; After pressing the "Connect" button, the connection will be saved to the list *only* if a connection could be established.</string>
+    <string name="discover_attempt">Please wait. Discovering, or, attempting connection..\nMax 16 seconds for an iBox to respond.</string>
+    <string name="ip_local_warn">The IP address you entered apppears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
+    <string name="colortemp">White Temperature</string>
+    <string name="rgbw">RGBW</string>
+    <string name="rgbww">RGBWW</string>
+    <string name="devices">Devices</string>
+
+    <string name="port">Port</string>
+    <string name="brightness">Luminosité</string>
+    <string name="saturation">Saturation</string>
+    <string name="rgbww_only">Seulement RGBWW-ampoules</string>
+    <string name="on">Allumer</string>
+    <string name="off">Éteindre</string>
+    <string name="wifi_bridge">iBox</string>
+    <string name="zone_1">1</string>
+    <string name="zone_2">2</string>
+    <string name="zone_3">3</string>
+    <string name="zone_4">4</string>
+    <string name="zones">Zones</string>
+    <string name="white">Blanc</string>
+    <string name="help">Dider</string>
+    <string name="via">via</string>
+    <string name="no_milight_devices_found">Aucun appareil Milight trouvé.</string>
+</resources>
