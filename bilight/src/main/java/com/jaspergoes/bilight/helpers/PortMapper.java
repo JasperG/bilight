@@ -1,5 +1,7 @@
 package com.jaspergoes.bilight.helpers;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import net.sbbi.upnp.impls.InternetGatewayDevice;
 import net.sbbi.upnp.messages.ActionResponse;
 import net.sbbi.upnp.messages.UPNPResponseException;
@@ -37,6 +39,8 @@ public class PortMapper {
 
         } catch (IOException e) {
 
+        } catch (Exception e) {
+            FirebaseCrash.log("UPnP at 1: " + e.toString());
         }
 
         return null;
@@ -90,6 +94,9 @@ public class PortMapper {
         } catch (UPNPResponseException e) {
 
         } catch (NumberFormatException e) {
+
+        } catch (Exception e) {
+            FirebaseCrash.log("UPnP at 2: " + e.toString());
         }
 
         return -1;
@@ -120,13 +127,15 @@ public class PortMapper {
 
         } catch (UPNPResponseException e) {
 
+        } catch (Exception e) {
+            FirebaseCrash.log("UPnP at 3: " + e.toString());
         }
 
         return false;
 
     }
 
-    public static boolean unmapPort(String externalIP, int port) throws IOException, UPNPResponseException {
+    /*public static boolean unmapPort(String externalIP, int port) throws IOException, UPNPResponseException {
 
 
         if (internetGatewayDevices == null) {
@@ -147,6 +156,6 @@ public class PortMapper {
 
         return false;
 
-    }
+    }*/
 
 }
