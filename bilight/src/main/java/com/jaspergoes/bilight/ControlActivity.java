@@ -211,8 +211,11 @@ public class ControlActivity extends AppCompatActivity {
         final AppCompatCheckBox zone_2 = (AppCompatCheckBox) findViewById(R.id.control_zone_2);
         final AppCompatCheckBox zone_3 = (AppCompatCheckBox) findViewById(R.id.control_zone_3);
         final AppCompatCheckBox zone_4 = (AppCompatCheckBox) findViewById(R.id.control_zone_4);
+        final DiscreteSeekBar seekbarSatr = (DiscreteSeekBar) findViewById(R.id.seekbar_saturation);
+        final DiscreteSeekBar seekbarTemp = (DiscreteSeekBar) findViewById(R.id.seekbar_colortemp);
 
          /* Set checkboxes, according to values currently stored in Controller */
+        boolean rgbww_on = false;
         for (int i : Controller.controlDevices) {
 
             switch (i) {
@@ -227,11 +230,15 @@ public class ControlActivity extends AppCompatActivity {
 
                 case 8:
                     rgb_ww.setChecked(true);
+                    rgbww_on = true;
                     break;
 
             }
 
         }
+
+        seekbarSatr.setEnabled(rgbww_on);
+        seekbarTemp.setEnabled(rgbww_on);
 
         for (int x : Controller.controlZones) {
 
@@ -245,6 +252,8 @@ public class ControlActivity extends AppCompatActivity {
                 zone_2.setChecked(true);
                 zone_3.setChecked(true);
                 zone_4.setChecked(true);
+
+                break;
 
             } else {
 
@@ -279,8 +288,19 @@ public class ControlActivity extends AppCompatActivity {
 
                 List<Integer> deviceList = new ArrayList<Integer>();
 
-                if (rgbww_on && any)
+                if (rgbww_on && any) {
+
                     deviceList.add(8);
+
+                    seekbarSatr.setEnabled(true);
+                    seekbarTemp.setEnabled(true);
+
+                } else {
+
+                    seekbarSatr.setEnabled(false);
+                    seekbarTemp.setEnabled(false);
+
+                }
 
                 if (rgbw_on && any)
                     deviceList.add(7);

@@ -183,10 +183,10 @@
                 android:id="@+id/seekbar_saturation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:dsb_indicatorColor="@color/colorPrimary"
+                app:dsb_indicatorColor="@color/slider"
                 app:dsb_max="100"
                 app:dsb_min="0"
-                app:dsb_progressColor="@color/colorPrimary"
+                app:dsb_progressColor="@color/slider"
                 app:dsb_value="100" />
 
             <RelativeLayout
@@ -213,10 +213,10 @@
                 android:id="@+id/seekbar_colortemp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:dsb_indicatorColor="@color/colorPrimary"
+                app:dsb_indicatorColor="@color/slider"
                 app:dsb_max="100"
                 app:dsb_min="0"
-                app:dsb_progressColor="@color/colorPrimary"
+                app:dsb_progressColor="@color/slider"
                 app:dsb_value="100" />
 
             <LinearLayout
