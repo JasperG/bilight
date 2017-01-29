@@ -9,4 +9,4 @@ Like this project? Help me get Milights by making a donation :) [![Donate](https
 
 ### Screenshot of version at 29th of January 2017
 
-![Screenshot](./blob/master/screenshot.png)
+![Screenshot](https://github.com/JasperG/bilight/blob/master/screenshot.png)
