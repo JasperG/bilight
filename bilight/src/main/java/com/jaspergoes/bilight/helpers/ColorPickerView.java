@@ -96,20 +96,6 @@ public class ColorPickerView extends View {
         mCenterPaint.setColor(BACKCOLOR);
         canvas.drawCircle(0, 0, CENTER_RADIUS, mCenterPaint);
 
-        if (mTrackingCenter) {
-
-            mCenterPaint.setColor(c);
-
-            if (mHighlightCenter) {
-                mCenterPaint.setAlpha(0xFF);
-            } else {
-                mCenterPaint.setAlpha(0x80);
-            }
-
-            canvas.drawCircle(0, 0, CENTER_RADIUS + mCenterPaint.getStrokeWidth(), mCenterPaint);
-
-        }
-
         if (!Controller.nowWhite) {
 
             float l = 1.25f;
@@ -122,6 +108,20 @@ public class ColorPickerView extends View {
             arrowPath.lineTo((float) Math.cos(a - 0.1) * radius * l, (float) Math.sin(a - 0.1) * radius * l);
             arrowPath.lineTo((float) Math.cos(a) * radius, (float) Math.sin(a) * radius);
             canvas.drawPath(arrowPath, mRadialPaint);
+
+        }
+        
+        if (mTrackingCenter) {
+
+            mCenterPaint.setColor(c);
+
+            if (mHighlightCenter) {
+                mCenterPaint.setAlpha(0xFF);
+            } else {
+                mCenterPaint.setAlpha(0x80);
+            }
+
+            canvas.drawCircle(0, 0, CENTER_RADIUS + mCenterPaint.getStrokeWidth(), mCenterPaint);
 
         }
 
