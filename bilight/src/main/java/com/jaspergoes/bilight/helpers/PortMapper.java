@@ -57,22 +57,26 @@ public class PortMapper {
 
                     Integer natTableSize = testIGD.getNatTableSize();
 
-                    for (int j = 0; j < natTableSize; j++) {
+                    if (natTableSize != null) {
 
-                        ActionResponse mapEntry = testIGD.getGenericPortMappingEntry(j);
+                        for (int j = 0; j < natTableSize; j++) {
 
-                        String internalClient = mapEntry.getOutActionArgumentValue("NewInternalClient");
-                        String remoteHost = mapEntry.getOutActionArgumentValue("NewRemoteHost");
-                        String internalPort = mapEntry.getOutActionArgumentValue("NewInternalPort");
+                            ActionResponse mapEntry = testIGD.getGenericPortMappingEntry(j);
 
-                        if (internalClient != null && remoteHost != null && internalPort != null) {
-                            if (internalClient.equals(checkAddress)) {
-                                if (remoteHost.equals("")) {
-                                    if (internalPort.equals("5987")) {
-                                        return Integer.parseInt(mapEntry.getOutActionArgumentValue("NewExternalPort"));
+                            String internalClient = mapEntry.getOutActionArgumentValue("NewInternalClient");
+                            String remoteHost = mapEntry.getOutActionArgumentValue("NewRemoteHost");
+                            String internalPort = mapEntry.getOutActionArgumentValue("NewInternalPort");
+
+                            if (internalClient != null && remoteHost != null && internalPort != null) {
+                                if (internalClient.equals(checkAddress)) {
+                                    if (remoteHost.equals("")) {
+                                        if (internalPort.equals("5987")) {
+                                            return Integer.parseInt(mapEntry.getOutActionArgumentValue("NewExternalPort"));
+                                        }
                                     }
                                 }
                             }
+
                         }
 
                     }
