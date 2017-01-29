@@ -231,7 +231,7 @@ public class Controller {
                             }
                         }
 
-                        milightDevices.add(new Device(discovery[0], discovery[1].replaceAll("(.{2})", "$1" + ':').substring(0, 17), defaultMilightPort));
+                        milightDevices.add(new Device(discovery[0], discovery[1].replaceAll("(.{2})", "$1" + ':').substring(0, 17), defaultMilightPort, false));
                         Collections.sort(milightDevices);
                         context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
@@ -247,7 +247,7 @@ public class Controller {
 
     }
 
-    public void setDevice(String address, int port, Context context) {
+    public void setDevice(String address, int port, boolean upnp, Context context) {
 
         isConnecting = true;
 
@@ -357,6 +357,7 @@ public class Controller {
                                 n.put("n", hostAddr);
                                 n.put("m", hostMac);
                                 n.put("p", milightPort);
+                                n.put("u", upnp);
                                 remoteArray.put(n);
 
                                 changed = true;

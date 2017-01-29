@@ -10,6 +10,7 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -31,11 +32,11 @@ import java.util.ArrayList;
 
 public class MainActivity extends PreferenceActivityCompat {
 
-    private class DevicePreference extends PreferenceCompat {
+    private class LocalDevicePreference extends PreferenceCompat {
 
         private final int deviceIndex;
 
-        DevicePreference(Context context, int deviceIndex) {
+        LocalDevicePreference(Context context, int deviceIndex) {
 
             super(context);
 
@@ -51,76 +52,7 @@ public class MainActivity extends PreferenceActivityCompat {
         @Override
         protected void onClick() {
 
-            if (this.isEnabled() && !Controller.isConnecting) {
-
-                Controller.isConnecting = true;
-
-                Device device = Controller.milightDevices.get(deviceIndex);
-
-                final String addressIP = device.addrIP;
-                final String addressMac = device.addrMAC;
-                final int addressPort = device.addrPort;
-
-                boolean hasRemoteConnectionConfigured = false;
-                for (Device remoteDevice : remoteMilightDevices) {
-                    if (addressMac.equals(remoteDevice.addrMAC)) {
-                        hasRemoteConnectionConfigured = true;
-                        break;
-                    }
-                }
-
-                new Thread(hasRemoteConnectionConfigured ? new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        Controller.INSTANCE.setDevice(addressIP, addressPort, getApplicationContext());
-
-                    }
-
-                } : new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        /* Try UPnP approach */
-                        String outerIP = PortMapper.getExternalIP();
-                        if (outerIP != null) {
-
-                            int mappedPort = PortMapper.checkMapped(addressIP);
-                            if (mappedPort == -1) {
-
-                                mappedPort = 5000 + (int) (Math.random() * 1999);
-                                if (PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac)) {
-
-                                    /* Created an upnp mapping. Great. Connect via external, to add it to the list. */
-                                    Controller.INSTANCE.setDevice(outerIP, mappedPort, getApplicationContext());
-
-                                    return;
-
-                                }
-
-                            } else {
-
-                                /* We already have a mapped port. Great. Connect via external, to add it to the list. */
-                                Controller.INSTANCE.setDevice(outerIP, mappedPort, getApplicationContext());
-
-                                return;
-
-                            }
-
-                        }
-
-                        /* Fallback, could not create upnp mapping; Use local */
-                        Controller.INSTANCE.setDevice(addressIP, addressPort, getApplicationContext());
-
-                    }
-
-                }).start();
-
-                updateList();
-
-            }
+            if (this.isEnabled() && !Controller.isConnecting) connectLocal(deviceIndex);
 
         }
 
@@ -139,7 +71,7 @@ public class MainActivity extends PreferenceActivityCompat {
             Device device = remoteMilightDevices.get(deviceIndex);
 
             this.setTitle(device.addrIP);
-            this.setSummary(device.addrMAC + (device.addrPort != Controller.defaultMilightPort ? " ( " + getString(R.string.port) + ": " + device.addrPort + " )" : ""));
+            this.setSummary(device.addrMAC + (device.addrPort != Controller.defaultMilightPort || device.isUPnP ? " ( " + getString(R.string.port) + ": " + device.addrPort + " " + (device.isUPnP ? "| UPnP " : "") + ")" : ""));
 
         }
 
@@ -148,10 +80,25 @@ public class MainActivity extends PreferenceActivityCompat {
 
             if (this.isEnabled() && !Controller.isConnecting) {
 
-                Device device = remoteMilightDevices.get(deviceIndex);
+                final Device device = remoteMilightDevices.get(deviceIndex);
 
-                final String addressIP = device.addrIP;
-                final int addressPort = device.addrPort;
+                if (device.isUPnP) {
+
+                    int l = Controller.milightDevices.size();
+
+                    for (int i = 0; i < l; i++) {
+
+                        if (device.addrMAC.equals(Controller.milightDevices.get(i).addrMAC)) {
+
+                            connectLocal(i);
+
+                            return;
+
+                        }
+
+                    }
+
+                }
 
                 Controller.isConnecting = true;
 
@@ -160,7 +107,7 @@ public class MainActivity extends PreferenceActivityCompat {
                     @Override
                     public void run() {
 
-                        Controller.INSTANCE.setDevice(addressIP, addressPort, getApplicationContext());
+                        Controller.INSTANCE.setDevice(device.addrIP, device.addrPort, device.isUPnP, getApplicationContext());
 
                     }
 
@@ -228,11 +175,11 @@ public class MainActivity extends PreferenceActivityCompat {
 
     };
 
+    private static ArrayList<Device> remoteMilightDevices = new ArrayList<Device>();
+
     private PreferenceCategoryCompat deviceList;
     private PreferenceCategoryCompat remoteList;
     private PreferenceCompat addRemote;
-
-    public static ArrayList<Device> remoteMilightDevices = new ArrayList<Device>();
 
     @SuppressWarnings("deprecation")
     @Override
@@ -327,7 +274,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
     }
 
-    void updateList() {
+    private void updateList() {
 
         boolean maySelect = !Controller.isConnecting;
         int i, l;
@@ -342,7 +289,7 @@ public class MainActivity extends PreferenceActivityCompat {
         /* Re-populate the list with discovered devices */
         if ((l = Controller.milightDevices.size()) > 0) {
             for (i = 0; i < l; i++) {
-                DevicePreference pref = new DevicePreference(this, i);
+                LocalDevicePreference pref = new LocalDevicePreference(this, i);
                 pref.setIcon(getResources().getDrawable(R.drawable.ic_bulb));
                 pref.setEnabled(maySelect);
                 deviceList.addPreference(pref);
@@ -367,7 +314,7 @@ public class MainActivity extends PreferenceActivityCompat {
             JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
             for (i = 0; i < remoteArray.length(); i++) {
                 JSONObject remote = remoteArray.getJSONObject(i);
-                remoteMilightDevices.add(new Device(remote.getString("n"), remote.getString("m"), remote.getInt("p")));
+                remoteMilightDevices.add(new Device(remote.getString("n"), remote.getString("m"), remote.getInt("p"), remote.optBoolean("u", false)));
                 RemoteDevicePreference pref = new RemoteDevicePreference(this, i);
                 pref.setIcon(getResources().getDrawable(R.drawable.ic_bulb));
                 pref.setEnabled(maySelect);
@@ -376,6 +323,139 @@ public class MainActivity extends PreferenceActivityCompat {
         } catch (JSONException e) {
             prefs.edit().putString("remotes", "[]").apply();
         }
+
+    }
+
+    private void connectLocal(int deviceIndex) {
+
+        Controller.isConnecting = true;
+
+        Device device = Controller.milightDevices.get(deviceIndex);
+
+        final String addressIP = device.addrIP;
+        final String addressMac = device.addrMAC;
+        final int addressPort = device.addrPort;
+
+        boolean hasRemoteConnectionConfigured = false;
+        boolean hasRemoteViaUPnP = false;
+
+        for (Device remoteDevice : remoteMilightDevices) {
+
+            if (addressMac.equals(remoteDevice.addrMAC)) {
+
+                hasRemoteConnectionConfigured = true;
+                hasRemoteViaUPnP = remoteDevice.isUPnP;
+
+                break;
+
+            }
+
+        }
+
+        /* We already have this device saved as a UPnP connection - Make sure to update lease */
+        if (hasRemoteViaUPnP) {
+
+            /* Renew lease -> Connect locally */
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    /* Connect locally */
+                    Controller.INSTANCE.setDevice(addressIP, addressPort, false, getApplicationContext());
+
+                    /* Try renewing UPnP lease */
+                    String outerIP = PortMapper.getExternalIP();
+
+                    if (outerIP != null) {
+
+                        int mappedPort = PortMapper.checkMapped(addressIP);
+
+                        if (mappedPort == -1) {
+
+                            /* No mapped port yet (or, any more) */
+                            /* Remote entry should, perhaps, be removed here */
+
+                        } else {
+
+                            /* Already have a mapped port; Renew UPnP lease */
+                            Log.e("RENEW LEASE", PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
+
+                        }
+
+                    }
+
+                }
+
+            }).start();
+
+        } else if (hasRemoteConnectionConfigured) {
+
+            /* No need to renew lease, is not UPnP -> Connect locally */
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    Controller.INSTANCE.setDevice(addressIP, addressPort, false, getApplicationContext());
+
+                }
+
+            }).start();
+
+        } else {
+
+            /* No remote connection configured -> Attempt UPnP mapping, connect remotely */
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    /* Try UPnP approach */
+                    String outerIP = PortMapper.getExternalIP();
+
+                    if (outerIP != null) {
+
+                        int mappedPort = PortMapper.checkMapped(addressIP);
+
+                        if (mappedPort == -1) {
+
+                            /* No mapped port yet */
+                            mappedPort = 5000 + (int) (Math.random() * 1999);
+
+                            if (PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac)) {
+
+                                /* Created an upnp mapping. Great. Connect via external, to add it to the list. */
+                                Controller.INSTANCE.setDevice(outerIP, mappedPort, true, getApplicationContext());
+
+                                return;
+
+                            }
+
+                        } else {
+
+                            /* Already have a mapped port; Renew UPnP lease */
+                            Log.e("RENEW LEASE", PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
+
+                            /* We already have a mapped port. Great. Connect via external, to add it to the list. */
+                            Controller.INSTANCE.setDevice(outerIP, mappedPort, true, getApplicationContext());
+
+                            return;
+
+                        }
+
+                    }
+
+                    /* Fallback, failure; Could not create upnp mapping; Use local */
+                    Controller.INSTANCE.setDevice(addressIP, addressPort, false, getApplicationContext());
+
+                }
+
+            }).start();
+
+        }
+
+        updateList();
 
     }
 

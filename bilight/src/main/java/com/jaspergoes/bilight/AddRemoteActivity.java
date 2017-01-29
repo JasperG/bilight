@@ -64,7 +64,7 @@ public class AddRemoteActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Controller.INSTANCE.setDevice(ip.getText().toString().trim(), Integer.parseInt(port.getText().toString().trim()), getApplicationContext());
+                        Controller.INSTANCE.setDevice(ip.getText().toString().trim(), Integer.parseInt(port.getText().toString().trim()), false, getApplicationContext());
                     }
                 }).start();
                 finish();
