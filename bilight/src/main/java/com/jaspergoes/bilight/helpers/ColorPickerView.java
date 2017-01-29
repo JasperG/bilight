@@ -17,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.jaspergoes.bilight.R;
+import com.jaspergoes.bilight.milight.Controller;
 
 public class ColorPickerView extends View {
 
@@ -109,16 +110,20 @@ public class ColorPickerView extends View {
 
         }
 
-        float l = 1.25f;
-        float a = (360 - colorAngle) * (float) Math.PI / 180;
-        float radius = CENTER_RADIUS - (mCenterPaint.getStrokeWidth() / 2);
+        if (!Controller.nowWhite) {
 
-        arrowPath.reset();
-        arrowPath.moveTo((float) Math.cos(a) * radius, (float) Math.sin(a) * radius);
-        arrowPath.lineTo((float) Math.cos(a + 0.1) * radius * l, (float) Math.sin(a + 0.1) * radius * l);
-        arrowPath.lineTo((float) Math.cos(a - 0.1) * radius * l, (float) Math.sin(a - 0.1) * radius * l);
-        arrowPath.lineTo((float) Math.cos(a) * radius, (float) Math.sin(a) * radius);
-        canvas.drawPath(arrowPath, mRadialPaint);
+            float l = 1.25f;
+            float a = (360 - colorAngle) * (float) Math.PI / 180;
+            float radius = CENTER_RADIUS - (mCenterPaint.getStrokeWidth() / 2);
+
+            arrowPath.reset();
+            arrowPath.moveTo((float) Math.cos(a) * radius, (float) Math.sin(a) * radius);
+            arrowPath.lineTo((float) Math.cos(a + 0.1) * radius * l, (float) Math.sin(a + 0.1) * radius * l);
+            arrowPath.lineTo((float) Math.cos(a - 0.1) * radius * l, (float) Math.sin(a - 0.1) * radius * l);
+            arrowPath.lineTo((float) Math.cos(a) * radius, (float) Math.sin(a) * radius);
+            canvas.drawPath(arrowPath, mRadialPaint);
+
+        }
 
         mCenterPaint.setStyle(Paint.Style.FILL);
         mCenterPaint.setColor(c);

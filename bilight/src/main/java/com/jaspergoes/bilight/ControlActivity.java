@@ -95,6 +95,8 @@ public class ControlActivity extends AppCompatActivity {
 
                 }).start();
 
+                ((ColorPickerView) findViewById(R.id.colorpicker)).invalidate();
+
             }
         });
 
@@ -189,6 +191,8 @@ public class ControlActivity extends AppCompatActivity {
                     synchronized (Controller.INSTANCE) {
                         Controller.INSTANCE.notify();
                     }
+
+                    ((ColorPickerView) findViewById(R.id.colorpicker)).invalidate();
 
                 }
 

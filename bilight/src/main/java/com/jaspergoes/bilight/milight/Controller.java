@@ -72,7 +72,7 @@ public class Controller {
     public static long keepAliveTime = 0;
 
     /* Whether the lamps are in WHITE mode */
-    private static boolean nowWhite = false;
+    public static boolean nowWhite = false;
 
     /* New color, brightness and saturation values to be submitted */
     public volatile static int newColor = -1;
