@@ -14,11 +14,20 @@
     <string name="rgbw">RGBW</string>
     <string name="rgbww">RGBWW</string>
     <string name="devices">Devices</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="milight_ibox">Milight iBox</string>
+    <string name="has_ibox_lamp">iBox lamp</string>
+    <string name="has_rgbw">RGBW bulb(s)</string>
+    <string name="has_rgbww">RGBWW bulb(s)</string>
+    <string name="has_dualw">Dual-White bulb(s)</string>
+    <string name="config_has">This Milight iBox has ..</string>
+    <string name="dualw">Dual-W</string>
 
     <string name="port">Anschluss</string>
     <string name="brightness">Helligkeit</string>
     <string name="saturation">Sättigung</string>
-    <string name="rgbww_only">Nur RGBWW-Glühlampen</string>
+    <string name="rgbww_dw_only">Nur RGBWW / Dual-W</string>
     <string name="on">Einschalten</string>
     <string name="off">Ausschalten</string>
     <string name="wifi_bridge">iBox</string>

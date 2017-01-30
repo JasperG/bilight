@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.jaspergoes.bilight.ControlActivity">
+    android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,246 +13,433 @@
         android:background="@color/colorPrimary"
         android:theme="@style/ToolBar" />
 
-    <com.jaspergoes.bilight.helpers.ScrollViewPlus
-        android:id="@+id/scrollcontent"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.jaspergoes.bilight.ControlActivity">
 
-        <LinearLayout
+        <!-- The main content view -->
+        <FrameLayout
+            android:id="@+id/content_frame"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="6dp"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="6dp">
+            android:layout_height="match_parent">
 
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <com.jaspergoes.bilight.helpers.ColorPickerView
-                    android:id="@+id/colorpicker"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true" />
-
-                <Button
-                    android:id="@+id/setWhite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:text="@string/white" />
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="6dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <com.jaspergoes.bilight.helpers.HorizontalFlowLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dp"
-                    android:layout_marginLeft="-6dp">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="60dp"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="6dp"
-                                android:layout_marginTop="6dp"
-                                android:text="@string/devices" />
-
-                        </LinearLayout>
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_wifi_bridge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/wifi_bridge"
-                            app:buttonTint="@color/colorPrimary" />
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_rgbw"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/rgbw"
-                            app:buttonTint="@color/colorPrimary" />
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_rgbww"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/rgbww"
-                            app:buttonTint="@color/colorPrimary" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="60dp"
-                            android:layout_height="wrap_content">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="6dp"
-                                android:layout_marginTop="6dp"
-                                android:text="@string/zones" />
-
-                        </LinearLayout>
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_zone_1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/zone_1"
-                            app:buttonTint="@color/colorPrimary" />
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_zone_2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/zone_2"
-                            app:buttonTint="@color/colorPrimary" />
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_zone_3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/zone_3"
-                            app:buttonTint="@color/colorPrimary" />
-
-                        <android.support.v7.widget.AppCompatCheckBox
-                            android:id="@+id/control_zone_4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/zone_4"
-                            app:buttonTint="@color/colorPrimary" />
-
-                    </LinearLayout>
-
-
-                </com.jaspergoes.bilight.helpers.HorizontalFlowLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/brightness" />
-
-                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                    android:id="@+id/seekbar_brightness"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:dsb_indicatorColor="@color/colorPrimary"
-                    app:dsb_max="100"
-                    app:dsb_min="0"
-                    app:dsb_progressColor="@color/colorPrimary"
-                    app:dsb_value="100" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:text="@string/saturation" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
-                        android:text="@string/rgbww_only" />
-
-                </RelativeLayout>
-
-                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                    android:id="@+id/seekbar_saturation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:dsb_indicatorColor="@color/slider"
-                    app:dsb_max="100"
-                    app:dsb_min="0"
-                    app:dsb_progressColor="@color/slider"
-                    app:dsb_value="100" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_alignParentStart="true"
-                        android:text="@string/colortemp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignParentRight="true"
-                        android:text="@string/rgbww_only" />
-
-                </RelativeLayout>
-
-                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
-                    android:id="@+id/seekbar_colortemp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:dsb_indicatorColor="@color/slider"
-                    app:dsb_max="100"
-                    app:dsb_min="0"
-                    app:dsb_progressColor="@color/slider"
-                    app:dsb_value="100" />
+            <com.jaspergoes.bilight.helpers.ScrollViewPlus
+                android:id="@+id/scrollcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="horizontal">
+                    android:orientation="vertical"
+                    android:paddingBottom="6dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="6dp">
 
-                    <Button
-                        android:id="@+id/switchOn"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/hasnodevice"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/on" />
+                        android:orientation="vertical">
 
-                    <Button
-                        android:id="@+id/switchOff"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="No lights!?!"
+                            android:textSize="18sp" />
+
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/omg" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/hasdevice"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/off" />
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:id="@+id/colorpicker_parent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="6dp"
+                            android:layout_weight="1">
+
+                            <com.jaspergoes.bilight.helpers.ColorPickerView
+                                android:id="@+id/colorpicker"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerHorizontal="true" />
+
+                            <Button
+                                android:id="@+id/setWhite"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:text="@string/white" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <com.jaspergoes.bilight.helpers.HorizontalFlowLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="6dp"
+                                android:layout_marginLeft="-6dp">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="60dp"
+                                        android:layout_height="wrap_content">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginLeft="6dp"
+                                            android:layout_marginTop="6dp"
+                                            android:text="@string/devices" />
+
+                                    </LinearLayout>
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_wifi_bridge"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/wifi_bridge"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_rgbw"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/rgbw"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_rgbww"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/zone_parent"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="60dp"
+                                        android:layout_height="wrap_content">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginLeft="6dp"
+                                            android:layout_marginTop="6dp"
+                                            android:text="@string/zones" />
+
+                                    </LinearLayout>
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_zone_1"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/zone_1"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_zone_2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/zone_2"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_zone_3"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/zone_3"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                    <android.support.v7.widget.AppCompatCheckBox
+                                        android:id="@+id/control_zone_4"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/zone_4"
+                                        app:buttonTint="@color/colorPrimary" />
+
+                                </LinearLayout>
+
+
+                            </com.jaspergoes.bilight.helpers.HorizontalFlowLayout>
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/brightness" />
+
+                            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                                android:id="@+id/seekbar_brightness"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:dsb_indicatorColor="@color/colorPrimary"
+                                app:dsb_max="100"
+                                app:dsb_min="0"
+                                app:dsb_progressColor="@color/colorPrimary"
+                                app:dsb_value="100" />
+
+                            <LinearLayout
+                                android:id="@+id/sattemp_parent"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentLeft="true"
+                                        android:layout_alignParentStart="true"
+                                        android:text="@string/saturation" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentEnd="true"
+                                        android:layout_alignParentRight="true"
+                                        android:text="@string/rgbww_dw_only" />
+
+                                </RelativeLayout>
+
+                                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                                    android:id="@+id/seekbar_saturation"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    app:dsb_indicatorColor="@color/slider"
+                                    app:dsb_max="100"
+                                    app:dsb_min="0"
+                                    app:dsb_progressColor="@color/slider"
+                                    app:dsb_value="100" />
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentLeft="true"
+                                        android:layout_alignParentStart="true"
+                                        android:text="@string/colortemp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentEnd="true"
+                                        android:layout_alignParentRight="true"
+                                        android:text="@string/rgbww_dw_only" />
+
+                                </RelativeLayout>
+
+                                <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                                    android:id="@+id/seekbar_colortemp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    app:dsb_indicatorColor="@color/slider"
+                                    app:dsb_max="100"
+                                    app:dsb_min="0"
+                                    app:dsb_progressColor="@color/slider"
+                                    app:dsb_value="100" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/switchOn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/on" />
+
+                                <Button
+                                    android:id="@+id/switchOff"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/off" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
+
+            </com.jaspergoes.bilight.helpers.ScrollViewPlus>
+
+        </FrameLayout>
+
+        <!-- The navigation drawer -->
+        <LinearLayout
+            android:id="@+id/left_drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#fff"
+            android:clickable="true"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:fitsSystemWindows="true"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:gravity="center_vertical"
+                    android:minHeight="?android:attr/listPreferredItemHeight"
+                    android:orientation="horizontal"
+                    android:paddingEnd="?android:attr/scrollbarSize"
+                    android:paddingRight="?android:attr/scrollbarSize"
+                    tools:ignore="RtlSymmetry,UnusedAttribute">
+
+                    <LinearLayout
+                        android:layout_width="36dip"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="6dip"
+                        android:layout_marginRight="6dip"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bulb" />
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left|start|center_vertical"
+                        android:layout_marginBottom="12dip"
+                        android:layout_marginEnd="6dip"
+                        android:layout_marginLeft="0dip"
+                        android:layout_marginRight="6dip"
+                        android:layout_marginStart="0dip"
+                        android:layout_marginTop="12dip"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:id="@+id/connect_mac"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:ellipsize="marquee"
+                            android:fadingEdge="horizontal"
+                            android:fontFamily="sans-serif"
+                            android:singleLine="true"
+                            android:textColor="?android:textColorPrimary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignLeft="@id/connect_mac"
+                            android:layout_alignStart="@id/connect_mac"
+                            android:layout_below="@id/connect_mac"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="sans-serif"
+                            android:maxLines="4"
+                            android:text="@string/milight_ibox"
+                            android:textColor="?android:textColorSecondary"
+                            android:textSize="14sp" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dip"
+                    android:layout_marginLeft="6dip"
+                    android:layout_marginTop="6dip"
+                    android:text="@string/config_has" />
+
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/has_ibox_lamp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dip"
+                    android:layout_marginLeft="6dip"
+                    android:text="@string/has_ibox_lamp"
+                    app:buttonTint="@color/colorPrimary" />
+
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/has_rgbw"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dip"
+                    android:layout_marginLeft="6dip"
+                    android:text="@string/has_rgbw"
+                    app:buttonTint="@color/colorPrimary" />
+
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/has_rgbww"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dip"
+                    android:layout_marginLeft="6dip"
+                    android:text="@string/has_rgbww"
+                    app:buttonTint="@color/colorPrimary" />
+
+                <android.support.v7.widget.AppCompatCheckBox
+                    android:id="@+id/has_dualw"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dip"
+                    android:text="@string/has_dualw"
+                    app:buttonTint="@color/colorPrimary" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-    </com.jaspergoes.bilight.helpers.ScrollViewPlus>
+    </android.support.v4.widget.DrawerLayout>
 
 </LinearLayout>

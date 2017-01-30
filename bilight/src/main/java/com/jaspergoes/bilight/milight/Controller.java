@@ -53,6 +53,9 @@ public class Controller {
     /* Controller device addr */
     public static InetAddress milightAddress;
 
+    /* Mac address of currently connected milight device */
+    public static String milightMac = "";
+
     /* Port to use, in case of remote access */
     public static int milightPort = 5987;
 
@@ -67,6 +70,8 @@ public class Controller {
 
     /* Whether we are connected */
     private volatile static boolean isConnected;
+
+    public static boolean hasRGBWW;
 
     /* Timestamp of last command sent; Used to detect thread death */
     public static long keepAliveTime = 0;
@@ -320,6 +325,7 @@ public class Controller {
                     boolean found = false;
                     for (int i = 0; i < milightDevices.size(); i++) {
                         if (milightDevices.get(i).addrIP.equals(hostAddr)) {
+                            milightMac = milightDevices.get(i).addrMAC;
                             found = true;
                             break;
                         }
@@ -329,6 +335,7 @@ public class Controller {
                     if (!found) {
 
                         String hostMac = bytesToHex(buffer, packet.getLength()).substring(14, 14 + 12).replaceAll("(.{2})", "$1" + ':').substring(0, 17);
+                        milightMac = hostMac;
                         boolean changed = false;
 
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -524,6 +531,7 @@ public class Controller {
                                     if (i == 0) {
                                         payloads.add(buildColorPayload(i, 0));
                                     } else {
+                                        if (i == 8 && !hasRGBWW) continue;
                                         for (int x : controlZones) {
                                             payloads.add(buildColorPayload(i, x));
                                         }
