@@ -73,6 +73,25 @@ public class AddRemoteActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        savedInstanceState.putString("hostip", ((EditText) findViewById(R.id.edit_ipaddress)).getText().toString());
+        savedInstanceState.putString("hostport", ((EditText) findViewById(R.id.edit_port)).getText().toString());
+        super.onSaveInstanceState(savedInstanceState);
+
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+
+        super.onRestoreInstanceState(savedInstanceState);
+        ((EditText) findViewById(R.id.edit_ipaddress)).setText(savedInstanceState.getString("hostip"));
+        ((EditText) findViewById(R.id.edit_port)).setText(savedInstanceState.getString("hostport"));
+        validate();
+
+    }
+
     private void validate() {
 
         boolean valid = true;
@@ -92,7 +111,8 @@ public class AddRemoteActivity extends AppCompatActivity {
 
         t = port.getText().toString().trim();
         try {
-            Integer.parseInt(t);
+            int n = Integer.parseInt(t);
+            if (n < 1 || n > 65535) valid = false;
         } catch (NumberFormatException e) {
             valid = false;
         }

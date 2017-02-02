@@ -1,1 +1,3 @@
-include ':bilight'
+include ':bilight', 'discreteseekbar'
+include ':localeapi'
+include ':localetoast_setting_plugin'

@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -82,8 +83,10 @@ public class ControlActivity extends AppCompatActivity {
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         ActionBar supportActionBar = getSupportActionBar();
-        supportActionBar.setDisplayHomeAsUpEnabled(true);
-        supportActionBar.setHomeButtonEnabled(true);
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setHomeButtonEnabled(true);
+        }
 
         setCheckboxes();
 
@@ -149,8 +152,8 @@ public class ControlActivity extends AppCompatActivity {
         });
 
         /* Audio analyzer | just trying out some stuff */
-        //MicrophoneAnalyzer mic = new MicrophoneAnalyzer();
-        //mic.startRecording();
+        // MicrophoneAnalyzer mic = new MicrophoneAnalyzer();
+        // mic.startRecording();
 
         /* Color */
         TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground});
@@ -240,13 +243,33 @@ public class ControlActivity extends AppCompatActivity {
                         Controller.INSTANCE.notify();
                     }
 
-                    ((ColorPickerView) findViewById(R.id.colorpicker)).invalidate();
+                    findViewById(R.id.colorpicker).invalidate();
 
                 }
 
             }
 
         });
+
+        /* Make sure zone and device group names have equal widths */
+        ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.hasdevice), "equal");
+        for (View v : views) {
+            v.post(new Runnable() {
+                @Override
+                public void run() {
+                    equal();
+                }
+            });
+        }
+
+    }
+
+    private void equal() {
+        int w = 0;
+        ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.hasdevice), "equal");
+        for (View v : views) w = Math.max(v.getMeasuredWidth(), w);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(w, LinearLayout.LayoutParams.WRAP_CONTENT);
+        for (View v : views) v.setLayoutParams(p);
 
     }
 
@@ -476,10 +499,18 @@ public class ControlActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-                iBoxSettings.hasIBoxLamp = has_iboxl.isChecked();
-                iBoxSettings.hasRGBW = has_rgbw0.isChecked();
-                iBoxSettings.hasRGBWW = has_rgbww.isChecked();
-                iBoxSettings.hasDualW = has_dualw.isChecked();
+                if (iBoxSettings.hasIBoxLamp != (iBoxSettings.hasIBoxLamp = has_iboxl.isChecked()) && iBoxSettings.hasIBoxLamp) {
+                    wifi_0.setChecked(true);
+                }
+                if (iBoxSettings.hasRGBW != (iBoxSettings.hasRGBW = has_rgbw0.isChecked()) && iBoxSettings.hasRGBW) {
+                    rgb_w0.setChecked(true);
+                }
+                if (iBoxSettings.hasRGBWW != (iBoxSettings.hasRGBWW = has_rgbww.isChecked()) && iBoxSettings.hasRGBWW) {
+                    rgb_ww.setChecked(true);
+                }
+                if (iBoxSettings.hasDualW != (iBoxSettings.hasDualW = has_dualw.isChecked()) && iBoxSettings.hasDualW) {
+                    rgb_ww.setChecked(true);
+                }
 
                 setElements();
 
@@ -503,9 +534,49 @@ public class ControlActivity extends AppCompatActivity {
 
                     Controller.controlZones = new int[]{-1};
 
+                } else {
+
+                    /* Set zones active */
+                    if (zone_1.isChecked() || zone_2.isChecked() || zone_3.isChecked() || zone_4.isChecked()) {
+
+                        if (zone_1.isChecked() && zone_2.isChecked() && zone_3.isChecked() && zone_4.isChecked()) {
+
+                            Controller.controlZones = new int[]{0};
+
+                        } else {
+
+                            List<Integer> zoneList = new ArrayList<Integer>();
+
+                            if (zone_1.isChecked())
+                                zoneList.add(1);
+
+                            if (zone_2.isChecked())
+                                zoneList.add(2);
+
+                            if (zone_3.isChecked())
+                                zoneList.add(3);
+
+                            if (zone_4.isChecked())
+                                zoneList.add(4);
+
+                            ret = new int[zoneList.size()];
+                            for (int i = 0; i < ret.length; i++) ret[i] = zoneList.get(i);
+
+                            Controller.controlZones = ret;
+
+                        }
+
+                    } else {
+
+                        /* None selected, at all */
+                        Controller.controlZones = new int[]{-1};
+
+                    }
+
                 }
 
                 iBoxSettings.save(getApplicationContext(), Controller.milightMac);
+
             }
 
         };
@@ -518,7 +589,6 @@ public class ControlActivity extends AppCompatActivity {
     }
 
     private void setElements() {
-
 
         if (!(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasIBoxLamp || iBoxSettings.hasDualW)) {
 
@@ -534,12 +604,47 @@ public class ControlActivity extends AppCompatActivity {
 
             findViewById(R.id.colorpicker_parent).setVisibility(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasIBoxLamp ? View.VISIBLE : View.GONE);
             findViewById(R.id.zone_parent).setVisibility(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
+
             findViewById(R.id.control_wifi_bridge).setVisibility(iBoxSettings.hasIBoxLamp ? View.VISIBLE : View.GONE);
             findViewById(R.id.control_rgbw).setVisibility(iBoxSettings.hasRGBW ? View.VISIBLE : View.GONE);
-            findViewById(R.id.control_rgbww).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
-            findViewById(R.id.sattemp_parent).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
+
             ((AppCompatCheckBox) findViewById(R.id.control_rgbww)).setText(iBoxSettings.hasRGBWW && iBoxSettings.hasDualW ? getString(R.string.rgbww) : (iBoxSettings.hasRGBWW ? getString(R.string.rgbww) : getString(R.string.dualw)));
+            findViewById(R.id.control_rgbww).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
+
+            findViewById(R.id.sattemp_parent).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
+
+            int countGroups = 0;
+            if (iBoxSettings.hasIBoxLamp) countGroups++;
+            if (iBoxSettings.hasRGBW) countGroups++;
+            if (iBoxSettings.hasRGBWW || iBoxSettings.hasDualW) countGroups++;
+            findViewById(R.id.device_parent).setVisibility(countGroups > 1 ? View.VISIBLE : View.GONE);
+
+            ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.sattemp_parent), "warn_rgbww");
+            for (View v : views) {
+                ((TextView) v).setText(getString(R.string.rgbww_dw_only).replace("%s", iBoxSettings.hasRGBWW && iBoxSettings.hasDualW ? getString(R.string.rgbww) + " / " + getString(R.string.dualw) : getString(iBoxSettings.hasRGBWW ? R.string.rgbww : R.string.dualw)));
+                v.setVisibility(iBoxSettings.hasIBoxLamp || iBoxSettings.hasRGBW ? View.VISIBLE : View.GONE);
+            }
+
         }
+
+    }
+
+    private static ArrayList<View> getViewsByTag(ViewGroup root, String tag) {
+        ArrayList<View> views = new ArrayList<View>();
+        final int childCount = root.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = root.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                views.addAll(getViewsByTag((ViewGroup) child, tag));
+            }
+
+            final Object tagObj = child.getTag();
+            if (tagObj != null && tagObj.equals(tag)) {
+                views.add(child);
+            }
+
+        }
+        return views;
     }
 
 }

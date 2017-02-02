@@ -33,11 +33,12 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:orientation="vertical"
-                    android:paddingBottom="6dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:paddingTop="6dp">
+                    android:paddingBottom="@dimen/activity_vertical_margin"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:paddingTop="@dimen/activity_vertical_margin">
 
                     <LinearLayout
                         android:id="@+id/hasnodevice"
@@ -50,7 +51,6 @@
                             android:layout_height="wrap_content"
                             android:text="No lights!?!"
                             android:textSize="18sp" />
-
 
                         <ImageView
                             android:layout_width="match_parent"
@@ -65,6 +65,7 @@
                         android:id="@+id/hasdevice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:baselineAligned="false"
                         android:orientation="horizontal">
 
                         <RelativeLayout
@@ -96,107 +97,88 @@
                             android:layout_weight="1"
                             android:orientation="vertical">
 
-                            <com.jaspergoes.bilight.helpers.HorizontalFlowLayout
-                                android:layout_width="match_parent"
+                            <LinearLayout
+                                android:id="@+id/device_parent"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="6dp"
-                                android:layout_marginLeft="-6dp">
+                                android:orientation="horizontal">
 
-                                <LinearLayout
+                                <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal">
+                                    android:paddingRight="6dp"
+                                    android:tag="equal"
+                                    android:text="@string/devices" />
 
-                                    <LinearLayout
-                                        android:layout_width="60dp"
-                                        android:layout_height="wrap_content">
-
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginLeft="6dp"
-                                            android:layout_marginTop="6dp"
-                                            android:text="@string/devices" />
-
-                                    </LinearLayout>
-
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_wifi_bridge"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/wifi_bridge"
-                                        app:buttonTint="@color/colorPrimary" />
-
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_rgbw"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/rgbw"
-                                        app:buttonTint="@color/colorPrimary" />
-
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_rgbww"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        app:buttonTint="@color/colorPrimary" />
-
-                                </LinearLayout>
-
-                                <LinearLayout
-                                    android:id="@+id/zone_parent"
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_wifi_bridge"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:orientation="horizontal">
+                                    android:text="@string/wifi_bridge"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                                    <LinearLayout
-                                        android:layout_width="60dp"
-                                        android:layout_height="wrap_content">
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_rgbw"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/rgbw"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginLeft="6dp"
-                                            android:layout_marginTop="6dp"
-                                            android:text="@string/zones" />
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_rgbww"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                                    </LinearLayout>
+                            </LinearLayout>
 
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_zone_1"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/zone_1"
-                                        app:buttonTint="@color/colorPrimary" />
+                            <LinearLayout
+                                android:id="@+id/zone_parent"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
 
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_zone_2"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/zone_2"
-                                        app:buttonTint="@color/colorPrimary" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:paddingRight="6dp"
+                                    android:tag="equal"
+                                    android:text="@string/zones" />
 
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_zone_3"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/zone_3"
-                                        app:buttonTint="@color/colorPrimary" />
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_zone_1"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/zone_1"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                                    <android.support.v7.widget.AppCompatCheckBox
-                                        android:id="@+id/control_zone_4"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/zone_4"
-                                        app:buttonTint="@color/colorPrimary" />
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_zone_2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/zone_2"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                                </LinearLayout>
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_zone_3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/zone_3"
+                                    app:buttonTint="@color/colorPrimary" />
 
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_zone_4"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/zone_4"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                            </com.jaspergoes.bilight.helpers.HorizontalFlowLayout>
+                            </LinearLayout>
 
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
                                 android:text="@string/brightness" />
 
                             <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
@@ -206,8 +188,7 @@
                                 app:dsb_indicatorColor="@color/colorPrimary"
                                 app:dsb_max="100"
                                 app:dsb_min="0"
-                                app:dsb_progressColor="@color/colorPrimary"
-                                app:dsb_value="100" />
+                                app:dsb_progressColor="@color/colorPrimary" />
 
                             <LinearLayout
                                 android:id="@+id/sattemp_parent"
@@ -231,7 +212,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_alignParentEnd="true"
                                         android:layout_alignParentRight="true"
-                                        android:text="@string/rgbww_dw_only" />
+                                        android:tag="warn_rgbww" />
 
                                 </RelativeLayout>
 
@@ -242,8 +223,7 @@
                                     app:dsb_indicatorColor="@color/slider"
                                     app:dsb_max="100"
                                     app:dsb_min="0"
-                                    app:dsb_progressColor="@color/slider"
-                                    app:dsb_value="100" />
+                                    app:dsb_progressColor="@color/slider" />
 
                                 <RelativeLayout
                                     android:layout_width="match_parent"
@@ -261,7 +241,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_alignParentEnd="true"
                                         android:layout_alignParentRight="true"
-                                        android:text="@string/rgbww_dw_only" />
+                                        android:tag="warn_rgbww" />
 
                                 </RelativeLayout>
 
@@ -272,8 +252,7 @@
                                     app:dsb_indicatorColor="@color/slider"
                                     app:dsb_max="100"
                                     app:dsb_min="0"
-                                    app:dsb_progressColor="@color/slider"
-                                    app:dsb_value="100" />
+                                    app:dsb_progressColor="@color/slider" />
 
                             </LinearLayout>
 

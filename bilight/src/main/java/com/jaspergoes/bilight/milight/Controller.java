@@ -127,7 +127,6 @@ public class Controller {
                     if (!localAddress.getClass().getSimpleName().equals("Inet4Address") || broadcastAddress == null)
                         continue;
 
-                    //networkInterfaceBound = false;
                     networkInterfaceName = networkInterface.getDisplayName() + " ( " + localAddress.getHostAddress() + " )";
                     context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
@@ -152,22 +151,19 @@ public class Controller {
 
         }
 
+        if (triedInterfaces == 0) {
+
+            Log.e("BILIGHT", "No suitable IPv4 network interfaces found for discovery cycle.");
+
+        } else if (milightDevices.size() == 0) {
+
+            Log.e("BILIGHT", "No WiFi iBox1 ( v6 ) could be found on your network, or, the device did not respond within 15 seconds.");
+
+        }
+
         /* Nothing found */
         isConnecting = false;
         context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
-
-        if (triedInterfaces == 0) {
-            Log.e("BILIGHT", "No suitable IPv4 network interfaces found for discovery cycle.");
-            //System.exit(0);
-        } else if (milightDevices.size() == 0) {
-            //if (socket != null) socket.close();
-
-            //ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().createImage(ClassLoader.getSystemResource("ibox.png")));
-            //JOptionPane.showMessageDialog(null, \n\nNote: You need a WiFi iBox1 ( v6 ) ( aka. \"WiFi Bridge v6\" ) from Controller / Applamp / LimitlessLED\nconnected to your network to use this application.\n\nRestart the application to retry discovery.\n\nTerminating.", WindowHelper.appTitle, JOptionPane.ERROR_MESSAGE, icon);
-            Log.e("BILIGHT", "No WiFi iBox1 ( v6 ) could be found on your network, or, the device did not respond within 15 seconds.");
-            //System.exit(0);
-
-        }
 
     }
 
@@ -178,14 +174,15 @@ public class Controller {
 
 		/* Bind new socket to given localAddress - thus - attaching to specific interface */
         try {
-            socket = new DatagramSocket(localPort, localAddress);
-        } catch (SocketException e) {
-            //JOptionPane.showMessageDialog(null, "Could not bind to port " + Integer.toString(localPort) + " at " + localAddress.getHostAddress() + ".\nIs another instance of the application already running?\n\n" + e.toString() + "\n\nTerminating.", WindowHelper.appTitle, JOptionPane.ERROR_MESSAGE);
-            Log.e("BILIGHT", "Could not bind to port " + Integer.toString(localPort) + " at " + localAddress.getHostAddress() + ".");
-            //System.exit(0);
-        }
 
-        //networkInterfaceBound = true;
+            socket = new DatagramSocket(localPort, localAddress);
+            socket.setSoTimeout(1000);
+
+        } catch (SocketException e) {
+
+            Log.e("BILIGHT", "Could not bind to port " + Integer.toString(localPort) + " at " + localAddress.getHostAddress() + ".");
+
+        }
 
         byte[] payload = new byte[]{(byte) 72, (byte) 70, (byte) 45, (byte) 65, (byte) 49, (byte) 49, (byte) 65, (byte) 83, (byte) 83, (byte) 73, (byte) 83, (byte) 84, (byte) 72, (byte) 82, (byte) 69, (byte) 65, (byte) 68};
 
@@ -197,9 +194,13 @@ public class Controller {
         do {
 
             try {
+
                 socket.send(new DatagramPacket(payload, payload.length, broadcastAddress, 48899));
+
             } catch (IOException e) {
+
                 /* This should never happen */
+
             }
 
 			/* Note:
@@ -215,8 +216,6 @@ public class Controller {
             do {
 
                 try {
-                    socket.setSoTimeout(1000);
-
                     socket.receive(packet);
 
 					/* We could have received literally anything from literally anywhere, so, check if this packet is actually something we're interested in */
@@ -248,7 +247,7 @@ public class Controller {
             while (System.currentTimeMillis() - timeout < (milightDevices.size() == 0 ? 8000 : 4000));
 
         }
-        while (++attempts < 2 && milightDevices.size() == 0);
+        while (milightDevices.size() == 0 && ++attempts < 2);
 
     }
 
@@ -261,11 +260,14 @@ public class Controller {
 
 		/* Bind new socket to any address - assuming android handles this right */
         try {
+
             socket = new DatagramSocket(localPort);
+            socket.setSoTimeout(1000);
+
         } catch (SocketException e) {
-            //JOptionPane.showMessageDialog(null, "Could not bind to port " + Integer.toString(localPort) + " at " + localAddress.getHostAddress() + ".\nIs another instance of the application already running?\n\n" + e.toString() + "\n\nTerminating.", WindowHelper.appTitle, JOptionPane.ERROR_MESSAGE);
+
             Log.e("BILIGHT", "Could not bind to port " + Integer.toString(localPort) + ".");
-            //System.exit(0);
+
         }
 
         context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
@@ -312,8 +314,6 @@ public class Controller {
         do {
 
             try {
-                socket.setSoTimeout(1000);
-
                 socket.receive(packet);
 
 				/* Check if the packet came from the selected device, and the received response is as expected */
@@ -501,7 +501,7 @@ public class Controller {
 
                 while (isConnected) {
 
-                    while (isConnected) {
+                    do {
 
                         controlDevices = Controller.controlDevices;
                         controlZones = Controller.controlZones;
@@ -511,33 +511,52 @@ public class Controller {
                             lastColor = newColor;
 
                             if (nowWhite) {
+
                                 nowWhite = false;
+
                                 byte[] payload;
                                 for (int i : controlDevices) {
+
                                     if (i == 0) {
+
                                         payload = buildColorPayload(i, 0);
                                         payloads.add(payload);
                                         payloads.add(payload);
+
                                     } else {
+
                                         for (int x : controlZones) {
                                             payload = buildColorPayload(i, x);
                                             payloads.add(payload);
                                             payloads.add(payload);
                                         }
+
                                     }
+
                                 }
+
                             } else {
+
                                 for (int i : controlDevices) {
+
                                     if (i == 0) {
+
                                         payloads.add(buildColorPayload(i, 0));
+
                                     } else {
+
                                         if (i == 8 && !hasRGBWW) continue;
+
                                         for (int x : controlZones) {
                                             payloads.add(buildColorPayload(i, x));
                                         }
+
                                     }
+
                                 }
+
                             }
+
                         }
 
                         if (lastBrightness != newBrightness && newBrightness != -1) {
@@ -545,13 +564,19 @@ public class Controller {
                             lastBrightness = newBrightness;
 
                             for (int i : controlDevices) {
+
                                 if (i == 0) {
+
                                     payloads.add(buildBrightnessPayload(i, 0));
+
                                 } else {
+
                                     for (int x : controlZones) {
                                         payloads.add(buildBrightnessPayload(i, x));
                                     }
+
                                 }
+
                             }
 
                         }
@@ -572,7 +597,30 @@ public class Controller {
 
                             if (!nowWhite) {
 
-                                setWhite();
+                                nowWhite = true;
+
+                                byte[] payload;
+                                for (int i : controlDevices) {
+
+                                    if (i == 0) {
+
+                                        payload = buildWhitePayload(i, 0);
+                                        payloads.add(payload);
+                                        payloads.add(payload);
+
+                                    } else {
+
+                                        for (int x : controlZones) {
+
+                                            payload = buildWhitePayload(i, x);
+                                            payloads.add(payload);
+                                            payloads.add(payload);
+
+                                        }
+
+                                    }
+
+                                }
 
                             } else {
 
@@ -592,9 +640,13 @@ public class Controller {
                             keepAliveTime = System.currentTimeMillis() + 5000;
                             keepAlive = false;
 
-                        } else break;
+                        } else {
 
-                    }
+                            break;
+
+                        }
+
+                    } while (isConnected);
 
                     if (isConnected) {
 
@@ -608,12 +660,18 @@ public class Controller {
                                 keepAliveTime = System.currentTimeMillis() + 5000;
 
                             } catch (IOException e) {
-                            /* This should never happen */
+
+                                /* This should never happen */
+
                             }
 
                         }
 
-                    } else break;
+                    } else {
+
+                        break;
+
+                    }
 
                     if ((wait = keepAliveTime - System.currentTimeMillis()) > 0) {
 
@@ -815,6 +873,9 @@ public class Controller {
 
                 /* This should never happen, but, if it does, for whatever reason; There would be no need for
                  * a followup Thread.sleep call, which will not be performed once this catch block has been reached */
+
+                isConnected = false;
+                break;
 
             } catch (InterruptedException e) {
 

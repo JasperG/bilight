@@ -113,8 +113,8 @@ public class ColorPickerView extends View {
             height -= resources.getDimensionPixelSize(resourceId);
         }
 
-        /* Minus the top and bottom padding of parent layout combined, as set in layout xml */
-        height -= (int) (12f * resources.getDisplayMetrics().density);
+        /* Minus the top and bottom padding of parent layout combined */
+        height -= (int) (resources.getDimension(R.dimen.activity_vertical_margin) * 2);
 
         /* Return the maximum height of our ColorPickerView */
         return height;

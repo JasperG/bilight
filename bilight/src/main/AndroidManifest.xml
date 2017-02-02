@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jaspergoes.bilight">
+    package="com.jaspergoes.bilight"
+    android:installLocation="internalOnly">
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!--<uses-permission android:name="android.permission.RECORD_AUDIO" />-->
@@ -21,10 +29,7 @@
 
         <activity android:name="com.jaspergoes.bilight.ControlActivity" />
 
-        <activity
-            android:name="com.jaspergoes.bilight.AddRemoteActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+        <activity android:name="com.jaspergoes.bilight.AddRemoteActivity" />
 
     </application>
 

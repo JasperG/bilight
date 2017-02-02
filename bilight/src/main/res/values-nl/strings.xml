@@ -13,21 +13,21 @@
     <string name="colortemp">Wit Temperatuur</string>
     <string name="rgbw">RGBW</string>
     <string name="rgbww">RGBWW</string>
-    <string name="devices">App.</string>
+    <string name="devices">Apparaten</string>
     <string name="drawer_open">Openen</string>
     <string name="drawer_close">Sluiten</string>
     <string name="milight_ibox">Milight iBox</string>
     <string name="has_ibox_lamp">iBox lamp</string>
     <string name="has_rgbw">RGBW lamp(en)</string>
     <string name="has_rgbww">RGBWW lamp(en)</string>
-    <string name="has_dualw">Dual-White lamp(en)</string>
+    <string name="has_dualw">Dual-W lamp(en)</string>
     <string name="config_has">Dit Milight apparaat bestuurt ..</string>
     <string name="dualw">Dual-W</string>
 
     <string name="port">Poort</string>
     <string name="brightness">Helderheid</string>
     <string name="saturation">Verzadiging</string>
-    <string name="rgbww_dw_only">Enkel RGBWW / Dual-W</string>
+    <string name="rgbww_dw_only">Enkel %s</string>
     <string name="on">Aan</string>
     <string name="off">Uit</string>
     <string name="wifi_bridge">iBox</string>

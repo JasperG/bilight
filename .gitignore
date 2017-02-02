@@ -53,3 +53,6 @@ gradlew.bat
 gradle/wrapper
 
 */google-services.json
+
+localeapi/
+localetoast_setting_plugin/
