@@ -23,6 +23,7 @@
     <string name="has_dualw">Dual-W bulb(s)</string>
     <string name="config_has">This Milight iBox has ..</string>
     <string name="dualw">Dual-W</string>
+    <string name="current_external_ip">Current IP</string>
 
     <string name="port">Anschluss</string>
     <string name="brightness">Helligkeit</string>

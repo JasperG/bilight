@@ -71,6 +71,8 @@ public class Controller {
     /* Whether we are connected */
     private volatile static boolean isConnected;
 
+    private final ArrayList<byte[]> payloads = new ArrayList<byte[]>();
+
     public static boolean hasRGBWW;
 
     /* Timestamp of last command sent; Used to detect thread death */
@@ -491,20 +493,37 @@ public class Controller {
             public void run() {
 
                 boolean keepAlive = false;
-
                 long wait;
+
+                boolean dataSent;
+
+                byte[] buffer = new byte[64];
+                DatagramPacket packet = new DatagramPacket(buffer, 64);
 
                 int[] controlDevices;
                 int[] controlZones;
-
-                ArrayList<byte[]> payloads = new ArrayList<byte[]>();
 
                 while (isConnected) {
 
                     do {
 
+                        dataSent = false;
+
                         controlDevices = Controller.controlDevices;
                         controlZones = Controller.controlZones;
+
+                        synchronized (payloads) {
+
+                            if (payloads.size() > 0) {
+
+                                dataSent = true;
+
+                                sendFrames(payloads, 100);
+                                payloads.clear();
+
+                            }
+
+                        }
 
                         if (lastColor != newColor && newColor != -1) {
 
@@ -517,18 +536,20 @@ public class Controller {
                                 byte[] payload;
                                 for (int i : controlDevices) {
 
+                                    dataSent = true;
+
                                     if (i == 0) {
 
                                         payload = buildColorPayload(i, 0);
-                                        payloads.add(payload);
-                                        payloads.add(payload);
+                                        sendFrame(payload);
+                                        sendFrame(payload);
 
                                     } else {
 
                                         for (int x : controlZones) {
                                             payload = buildColorPayload(i, x);
-                                            payloads.add(payload);
-                                            payloads.add(payload);
+                                            sendFrame(payload);
+                                            sendFrame(payload);
                                         }
 
                                     }
@@ -539,16 +560,18 @@ public class Controller {
 
                                 for (int i : controlDevices) {
 
+                                    dataSent = true;
+
                                     if (i == 0) {
 
-                                        payloads.add(buildColorPayload(i, 0));
+                                        sendFrame(buildColorPayload(i, 0));
 
                                     } else {
 
                                         if (i == 8 && !hasRGBWW) continue;
 
                                         for (int x : controlZones) {
-                                            payloads.add(buildColorPayload(i, x));
+                                            sendFrame(buildColorPayload(i, x));
                                         }
 
                                     }
@@ -565,14 +588,16 @@ public class Controller {
 
                             for (int i : controlDevices) {
 
+                                dataSent = true;
+
                                 if (i == 0) {
 
-                                    payloads.add(buildBrightnessPayload(i, 0));
+                                    sendFrame(buildBrightnessPayload(i, 0));
 
                                 } else {
 
                                     for (int x : controlZones) {
-                                        payloads.add(buildBrightnessPayload(i, x));
+                                        sendFrame(buildBrightnessPayload(i, x));
                                     }
 
                                 }
@@ -586,7 +611,10 @@ public class Controller {
                             lastSaturation = newSaturation;
 
                             for (int x : controlZones) {
-                                payloads.add(buildSaturationPayload(x));
+
+                                dataSent = true;
+
+                                sendFrame(buildSaturationPayload(x));
                             }
 
                         }
@@ -602,19 +630,21 @@ public class Controller {
                                 byte[] payload;
                                 for (int i : controlDevices) {
 
+                                    dataSent = true;
+
                                     if (i == 0) {
 
                                         payload = buildWhitePayload(i, 0);
-                                        payloads.add(payload);
-                                        payloads.add(payload);
+                                        sendFrame(payload);
+                                        sendFrame(payload);
 
                                     } else {
 
                                         for (int x : controlZones) {
 
                                             payload = buildWhitePayload(i, x);
-                                            payloads.add(payload);
-                                            payloads.add(payload);
+                                            sendFrame(payload);
+                                            sendFrame(payload);
 
                                         }
 
@@ -625,17 +655,17 @@ public class Controller {
                             } else {
 
                                 for (int x : controlZones) {
-                                    payloads.add(buildWhitePayload(8, x));
+
+                                    dataSent = true;
+
+                                    sendFrame(buildWhitePayload(8, x));
                                 }
 
                             }
 
                         }
 
-                        if (payloads.size() > 0) {
-
-                            sendFrames(payloads, 75);
-                            payloads.clear();
+                        if (dataSent) {
 
                             keepAliveTime = System.currentTimeMillis() + 5000;
                             keepAlive = false;
@@ -656,6 +686,28 @@ public class Controller {
                             try {
 
                                 socket.send(new DatagramPacket(new byte[]{(byte) 208, (byte) 0, (byte) 0, (byte) 0, (byte) 2, milightSessionByte1, milightSessionByte2}, 7, milightAddress, milightPort));
+
+                                try {
+
+                                    /* Consume the entire incoming buffer on the transport stack, and break out when a keep-alive response is found (which should be the last incoming message on the stack).
+                                     * A timeout would mean an empty stack, and no response to our keep-alive message found. Thus, a valid reason to assume the connection has been lost */
+                                    while (true) {
+
+                                        socket.receive(packet);
+
+                                        /* Identify keep-alive response byte-array */
+                                        if (packet.getLength() == 12 && ((int) buffer[0]) == -40 && ((int) buffer[4]) == 7)
+                                            break;
+
+                                    }
+
+                                } catch (SocketTimeoutException e) {
+
+                                    /* Timeout, no keep-alive response found on stack. End life of this worker thread, flag isConnected false, finish up ControlActivity */
+                                    isConnected = false;
+                                    break;
+
+                                }
 
                                 keepAliveTime = System.currentTimeMillis() + 5000;
 
@@ -698,6 +750,13 @@ public class Controller {
 
         }.start();
 
+    }
+
+    public static void disconnect() {
+        if (socket != null) {
+            isConnected = false;
+            socket.close();
+        }
     }
 
     private byte[] buildColorPayload(int deviceGroup, int milightZone) {
@@ -764,29 +823,33 @@ public class Controller {
 
         /* We'll just send each command for white two times */
 
-        nowWhite = true;
-
         int[] controlDevices = Controller.controlDevices;
         int[] controlZones = Controller.controlZones;
 
-        ArrayList<byte[]> payloads = new ArrayList<byte[]>();
         byte[] payload;
 
-        for (int i : controlDevices) {
-            if (i == 0) {
-                payload = buildWhitePayload(i, 0);
-                payloads.add(payload);
-                payloads.add(payload);
-            } else {
-                for (int x : controlZones) {
-                    payload = buildWhitePayload(i, x);
+        synchronized (payloads) {
+
+            nowWhite = true;
+
+            for (int i : controlDevices) {
+                if (i == 0) {
+                    payload = buildWhitePayload(i, 0);
                     payloads.add(payload);
                     payloads.add(payload);
+                } else {
+                    for (int x : controlZones) {
+                        payload = buildWhitePayload(i, x);
+                        payloads.add(payload);
+                        payloads.add(payload);
+                    }
                 }
             }
         }
 
-        sendFrames(payloads, 100);
+        synchronized (Controller.INSTANCE) {
+            Controller.INSTANCE.notify();
+        }
 
     }
 
@@ -811,24 +874,27 @@ public class Controller {
         int[] controlDevices = Controller.controlDevices;
         int[] controlZones = Controller.controlZones;
 
-        ArrayList<byte[]> payloads = new ArrayList<byte[]>();
         byte[] payload;
 
-        for (int i : controlDevices) {
-            if (i == 0) {
-                payload = buildSwitchPayload(i, 0, onOff);
-                payloads.add(payload);
-                payloads.add(payload);
-            } else {
-                for (int x : controlZones) {
-                    payload = buildSwitchPayload(i, x, onOff);
+        synchronized (payloads) {
+            for (int i : controlDevices) {
+                if (i == 0) {
+                    payload = buildSwitchPayload(i, 0, onOff);
                     payloads.add(payload);
                     payloads.add(payload);
+                } else {
+                    for (int x : controlZones) {
+                        payload = buildSwitchPayload(i, x, onOff);
+                        payloads.add(payload);
+                        payloads.add(payload);
+                    }
                 }
             }
         }
 
-        sendFrames(payloads, 100);
+        synchronized (Controller.INSTANCE) {
+            Controller.INSTANCE.notify();
+        }
 
     }
 
@@ -858,6 +924,28 @@ public class Controller {
 
     }
 
+    private void sendFrame(byte[] payload) {
+
+        try {
+
+            socket.send(new DatagramPacket(payload, 22, milightAddress, milightPort));
+
+            /* Wait 'sleep' milliseconds for previous RF command to propagate from iBox */
+            Thread.sleep(75);
+
+        } catch (IOException e) {
+
+                /* This should never happen, but, if it does, for whatever reason; There would be no need for
+                 * a followup Thread.sleep call, which will not be performed once this catch block has been reached */
+
+        } catch (InterruptedException e) {
+
+                /* This may happen, and I wouldn't care one byte */
+
+        }
+
+    }
+
     private void sendFrames(ArrayList<byte[]> payloads, int sleep) {
 
         for (byte[] payload : payloads) {
@@ -873,9 +961,6 @@ public class Controller {
 
                 /* This should never happen, but, if it does, for whatever reason; There would be no need for
                  * a followup Thread.sleep call, which will not be performed once this catch block has been reached */
-
-                isConnected = false;
-                break;
 
             } catch (InterruptedException e) {
 

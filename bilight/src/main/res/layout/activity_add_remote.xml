@@ -40,10 +40,24 @@
                 android:layout_height="wrap_content"
                 android:text="@string/ipaddress_hostname" />
 
-            <android.support.v7.widget.AppCompatEditText
-                android:id="@+id/edit_ipaddress"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/edit_ipaddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/current_external_ip" />
+
+                <Button
+                    android:id="@+id/current_external_ip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/current_external_ip" />
+
+            </RelativeLayout>
 
             <com.jaspergoes.bilight.helpers.TextViewPlus
                 android:id="@+id/ip_local_warn"
@@ -59,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/port" />
 
-            <android.support.v7.widget.AppCompatEditText
+            <EditText
                 android:id="@+id/edit_port"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

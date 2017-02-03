@@ -257,19 +257,10 @@ public class ControlActivity extends AppCompatActivity {
             v.post(new Runnable() {
                 @Override
                 public void run() {
-                    equal();
+                    equalWidths();
                 }
             });
         }
-
-    }
-
-    private void equal() {
-        int w = 0;
-        ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.hasdevice), "equal");
-        for (View v : views) w = Math.max(v.getMeasuredWidth(), w);
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(w, LinearLayout.LayoutParams.WRAP_CONTENT);
-        for (View v : views) v.setLayoutParams(p);
 
     }
 
@@ -319,6 +310,17 @@ public class ControlActivity extends AppCompatActivity {
 
         // Handle your other action bar items...
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStop() {
+
+        super.onStop();
+
+        if (isFinishing()) {
+            Controller.disconnect();
+        }
+
     }
 
     private void setCheckboxes() {
@@ -626,6 +628,15 @@ public class ControlActivity extends AppCompatActivity {
             }
 
         }
+
+    }
+
+    private void equalWidths() {
+        int w = 0;
+        ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.hasdevice), "equal");
+        for (View v : views) w = Math.max(v.getMeasuredWidth(), w);
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(w, LinearLayout.LayoutParams.WRAP_CONTENT);
+        for (View v : views) v.setLayoutParams(p);
 
     }
 

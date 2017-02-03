@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.jaspergoes.bilight.helpers.PortMapper;
 import com.jaspergoes.bilight.milight.Controller;
 
 import java.util.regex.Pattern;
@@ -70,6 +71,36 @@ public class AddRemoteActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        findViewById(R.id.current_external_ip).setVisibility(View.GONE);
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                /* Try UPnP approach */
+                final String outerIP = PortMapper.getExternalIP();
+                if (outerIP != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Button b = (Button) findViewById(R.id.current_external_ip);
+                            b.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    EditText e = (EditText) findViewById(R.id.edit_ipaddress);
+                                    e.setText(outerIP);
+                                    e.requestFocus();
+                                }
+                            });
+                            b.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+            }
+
+        }).start();
 
     }
 

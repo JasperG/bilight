@@ -23,6 +23,7 @@
     <string name="has_dualw">Dual-W lamp(en)</string>
     <string name="config_has">Dit Milight apparaat bestuurt ..</string>
     <string name="dualw">Dual-W</string>
+    <string name="current_external_ip">Huidig IP</string>
 
     <string name="port">Poort</string>
     <string name="brightness">Helderheid</string>

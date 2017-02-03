@@ -248,6 +248,23 @@ public class ColorPickerView extends View {
                         invalidate();
 
                     }
+                    else
+                    {
+
+                        float angle = (float) java.lang.Math.atan2(y, x);
+
+                        COLOR_ANGLE = (angle < 0 ? 2 * PI + angle : angle) * 180 / PI;
+
+                        // need to turn angle [-PI ... PI] into unit [0....1]
+                        float unit = angle / (2 * PI);
+                        if (unit < 0) unit += 1;
+                        mCenterPaint.setColor(COLOR = interpColor(unit));
+
+                        mListener.colorChanged((int) ((360 - COLOR_ANGLE) * 0.7111111f));
+
+                        invalidate();
+
+                    }
 
                 }
 

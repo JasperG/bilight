@@ -28,6 +28,9 @@ public class PreferenceCategoryCompat extends PreferenceCategory {
 
         View view = super.onCreateView(parent);
 
+        /* Remove category background color */
+        view.setBackgroundColor(0x00000000);
+
         /* Primary color foreground */
         TextView titleView = (TextView) view.findViewById(android.R.id.title);
         titleView.setTextColor(parent.getResources().getColor(R.color.colorPrimary));

@@ -290,14 +290,14 @@ public class MainActivity extends PreferenceActivityCompat {
         if ((l = Controller.milightDevices.size()) > 0) {
             for (i = 0; i < l; i++) {
                 LocalDevicePreference pref = new LocalDevicePreference(this, i);
-                pref.setIcon(getResources().getDrawable(R.drawable.ic_bulb));
+                pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
                 pref.setEnabled(maySelect);
                 deviceList.addPreference(pref);
             }
         } else {
             PreferenceCompat pref = new PreferenceCompat(this);
             pref.setTitle(getString(R.string.no_milight_devices_found));
-            pref.setIcon(getResources().getDrawable(R.drawable.ic_bulb_grey));
+            pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
             pref.setEnabled(false);
             deviceList.addPreference(pref);
         }
@@ -316,7 +316,7 @@ public class MainActivity extends PreferenceActivityCompat {
                 JSONObject remote = remoteArray.getJSONObject(i);
                 remoteMilightDevices.add(new Device(remote.getString("n"), remote.getString("m"), remote.getInt("p"), remote.optBoolean("u", false)));
                 RemoteDevicePreference pref = new RemoteDevicePreference(this, i);
-                pref.setIcon(getResources().getDrawable(R.drawable.ic_bulb));
+                pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
                 pref.setEnabled(maySelect);
                 remoteList.addPreference(pref);
             }

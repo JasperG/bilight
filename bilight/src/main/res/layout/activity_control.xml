@@ -314,7 +314,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:src="@drawable/ic_bulb" />
+                            android:src="@drawable/ic_ibox" />
 
                     </LinearLayout>
 
@@ -368,40 +368,130 @@
                     android:layout_marginTop="6dip"
                     android:text="@string/config_has" />
 
-                <android.support.v7.widget.AppCompatCheckBox
-                    android:id="@+id/has_ibox_lamp"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dip"
-                    android:layout_marginLeft="6dip"
-                    android:text="@string/has_ibox_lamp"
-                    app:buttonTint="@color/colorPrimary" />
+                    android:gravity="center_vertical"
+                    android:minHeight="36dip">
 
-                <android.support.v7.widget.AppCompatCheckBox
-                    android:id="@+id/has_rgbw"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dip"
-                    android:layout_marginLeft="6dip"
-                    android:text="@string/has_rgbw"
-                    app:buttonTint="@color/colorPrimary" />
+                    <LinearLayout
+                        android:layout_width="36dip"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="6dip"
+                        android:layout_marginRight="6dip"
+                        android:gravity="center">
 
-                <android.support.v7.widget.AppCompatCheckBox
-                    android:id="@+id/has_rgbww"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dip"
-                    android:layout_marginLeft="6dip"
-                    android:text="@string/has_rgbww"
-                    app:buttonTint="@color/colorPrimary" />
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_ibox" />
 
-                <android.support.v7.widget.AppCompatCheckBox
-                    android:id="@+id/has_dualw"
+                    </LinearLayout>
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/has_ibox_lamp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-6dp"
+                        android:text="@string/has_ibox_lamp"
+                        app:buttonTint="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="6dip"
-                    android:text="@string/has_dualw"
-                    app:buttonTint="@color/colorPrimary" />
+                    android:gravity="center_vertical"
+                    android:minHeight="36dip">
+
+                    <LinearLayout
+                        android:layout_width="36dip"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="6dip"
+                        android:layout_marginRight="6dip"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bulb" />
+
+                    </LinearLayout>
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/has_rgbw"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-6dp"
+                        android:text="@string/has_rgbw"
+                        app:buttonTint="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:minHeight="36dip">
+
+                    <LinearLayout
+                        android:layout_width="36dip"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="6dip"
+                        android:layout_marginRight="6dip"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bulb" />
+
+                    </LinearLayout>
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/has_rgbww"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-6dp"
+                        android:text="@string/has_rgbww"
+                        app:buttonTint="@color/colorPrimary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:minHeight="36dip">
+
+                    <LinearLayout
+                        android:id="@+id/icon_dualw"
+                        android:layout_width="36dip"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="6dip"
+                        android:layout_marginRight="6dip"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bulb" />
+
+                    </LinearLayout>
+
+                    <android.support.v7.widget.AppCompatCheckBox
+                        android:id="@+id/has_dualw"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-6dp"
+                        android:text="@string/has_dualw"
+                        app:buttonTint="@color/colorPrimary" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
