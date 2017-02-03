@@ -1,5 +1,5 @@
 # bilight
-An Android application that controls RGBW and RGBWW lightbulbs at the same time, without having to switch "Remotes" like in the original application. Only compatible with the Milight v6 protocol(!)
+An Android application that controls RGBW and RGBWW lightbulbs at the same time, without having to switch "Remotes" like in the original application. Unlike the original, this application works on Android 2.3.3 and up. Only compatible with the Milight v6 protocol(!)
 
 This is a work in progress. However, as the current version completely works for me, I will wait for any issues to be reported before continuing any development. Feature requests? Commit a pull request, or, drop me a line. (Signed, Jan 25th 2017)
 
