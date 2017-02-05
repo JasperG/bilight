@@ -9,13 +9,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.jaspergoes.bilight.helpers.ColorPickerView;
@@ -93,7 +94,7 @@ public class ControlActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.connect_mac)).setText(Controller.milightMac);
 
         /* Switch on */
-        ((Button) findViewById(R.id.switchOn)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.switchOn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -112,7 +113,7 @@ public class ControlActivity extends AppCompatActivity {
         });
 
         /* Switch off */
-        ((Button) findViewById(R.id.switchOff)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.switchOff).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -131,7 +132,7 @@ public class ControlActivity extends AppCompatActivity {
         });
 
         /* White mode */
-        ((Button) findViewById(R.id.setWhite)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.setWhite).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -146,7 +147,7 @@ public class ControlActivity extends AppCompatActivity {
 
                 }).start();
 
-                ((ColorPickerView) findViewById(R.id.colorpicker)).invalidate();
+                findViewById(R.id.colorpicker).invalidate();
 
             }
         });
@@ -325,21 +326,11 @@ public class ControlActivity extends AppCompatActivity {
 
     private void setCheckboxes() {
 
-        final AppCompatCheckBox wifi_0 = (AppCompatCheckBox) findViewById(R.id.control_wifi_bridge);
-        final AppCompatCheckBox rgb_w0 = (AppCompatCheckBox) findViewById(R.id.control_rgbw);
-        final AppCompatCheckBox rgb_ww = (AppCompatCheckBox) findViewById(R.id.control_rgbww);
-        final AppCompatCheckBox zone_1 = (AppCompatCheckBox) findViewById(R.id.control_zone_1);
-        final AppCompatCheckBox zone_2 = (AppCompatCheckBox) findViewById(R.id.control_zone_2);
-        final AppCompatCheckBox zone_3 = (AppCompatCheckBox) findViewById(R.id.control_zone_3);
-        final AppCompatCheckBox zone_4 = (AppCompatCheckBox) findViewById(R.id.control_zone_4);
-
+        /* Available device groups */
         final AppCompatCheckBox has_iboxl = (AppCompatCheckBox) findViewById(R.id.has_ibox_lamp);
         final AppCompatCheckBox has_rgbw0 = (AppCompatCheckBox) findViewById(R.id.has_rgbw);
         final AppCompatCheckBox has_rgbww = (AppCompatCheckBox) findViewById(R.id.has_rgbww);
         final AppCompatCheckBox has_dualw = (AppCompatCheckBox) findViewById(R.id.has_dualw);
-
-        final DiscreteSeekBar seekbarSatr = (DiscreteSeekBar) findViewById(R.id.seekbar_saturation);
-        final DiscreteSeekBar seekbarTemp = (DiscreteSeekBar) findViewById(R.id.seekbar_colortemp);
 
         /* Set checkboxes, according to values saved in settings */
         has_iboxl.setChecked(iBoxSettings.hasIBoxLamp);
@@ -347,10 +338,25 @@ public class ControlActivity extends AppCompatActivity {
         has_rgbww.setChecked(iBoxSettings.hasRGBWW);
         has_dualw.setChecked(iBoxSettings.hasDualW);
 
+        /* Device groups */
+        final AppCompatCheckBox wifi_0 = (AppCompatCheckBox) findViewById(R.id.control_wifi_bridge);
+        final AppCompatCheckBox rgb_w0 = (AppCompatCheckBox) findViewById(R.id.control_rgbw);
+        final AppCompatCheckBox rgb_ww = (AppCompatCheckBox) findViewById(R.id.control_rgbww);
+        final AppCompatCheckBox dualww = (AppCompatCheckBox) findViewById(R.id.control_dualw);
+
+        /* Zones */
+        final AppCompatCheckBox zone_1 = (AppCompatCheckBox) findViewById(R.id.control_zone_1);
+        final AppCompatCheckBox zone_2 = (AppCompatCheckBox) findViewById(R.id.control_zone_2);
+        final AppCompatCheckBox zone_3 = (AppCompatCheckBox) findViewById(R.id.control_zone_3);
+        final AppCompatCheckBox zone_4 = (AppCompatCheckBox) findViewById(R.id.control_zone_4);
+
+        /* Seekbars */
+        final DiscreteSeekBar seekbarSatr = (DiscreteSeekBar) findViewById(R.id.seekbar_saturation);
+        final DiscreteSeekBar seekbarTemp = (DiscreteSeekBar) findViewById(R.id.seekbar_colortemp);
+
         setElements();
 
         /* Set checkboxes, according to values currently stored in Controller */
-        boolean rgbww_on = false;
         for (int i : Controller.controlDevices) {
 
             switch (i) {
@@ -359,21 +365,23 @@ public class ControlActivity extends AppCompatActivity {
                     wifi_0.setChecked(true);
                     break;
 
+                case 3:
+                    dualww.setChecked(true);
+                    break;
+
                 case 7:
                     rgb_w0.setChecked(true);
                     break;
 
                 case 8:
                     rgb_ww.setChecked(true);
-                    rgbww_on = true;
                     break;
 
             }
 
         }
 
-        seekbarSatr.setEnabled(rgbww_on);
-        seekbarTemp.setEnabled(rgbww_on);
+        boolean any = false;
 
         for (int x : Controller.controlZones) {
 
@@ -382,6 +390,8 @@ public class ControlActivity extends AppCompatActivity {
                 break;
 
             } else if (x == 0) {
+
+                any = true;
 
                 zone_1.setChecked(true);
                 zone_2.setChecked(true);
@@ -394,15 +404,19 @@ public class ControlActivity extends AppCompatActivity {
 
                 switch (x) {
                     case 1:
+                        any = true;
                         zone_1.setChecked(true);
                         break;
                     case 2:
+                        any = true;
                         zone_2.setChecked(true);
                         break;
                     case 3:
+                        any = true;
                         zone_3.setChecked(true);
                         break;
                     case 4:
+                        any = true;
                         zone_4.setChecked(true);
                         break;
 
@@ -412,6 +426,9 @@ public class ControlActivity extends AppCompatActivity {
 
         }
 
+        seekbarSatr.setEnabled(any && rgb_ww.isChecked());
+        seekbarTemp.setEnabled(any && (rgb_ww.isChecked() || dualww.isChecked()));
+
         AppCompatCheckBox.OnCheckedChangeListener changeListener = new AppCompatCheckBox.OnCheckedChangeListener() {
 
             @Override
@@ -419,26 +436,22 @@ public class ControlActivity extends AppCompatActivity {
 
                 boolean rgbw_on = rgb_w0.isChecked();
                 boolean rgbww_on = rgb_ww.isChecked();
+                boolean dualw_on = dualww.isChecked();
                 boolean any = zone_1.isChecked() || zone_2.isChecked() || zone_3.isChecked() || zone_4.isChecked();
 
                 List<Integer> deviceList = new ArrayList<Integer>();
 
-                if (rgbww_on && any) {
+                seekbarSatr.setEnabled(any && rgbww_on);
+                seekbarTemp.setEnabled(any && (rgbww_on || dualw_on));
 
+                if (rgbww_on && any)
                     deviceList.add(8);
-
-                    seekbarSatr.setEnabled(true);
-                    seekbarTemp.setEnabled(true);
-
-                } else {
-
-                    seekbarSatr.setEnabled(false);
-                    seekbarTemp.setEnabled(false);
-
-                }
 
                 if (rgbw_on && any)
                     deviceList.add(7);
+
+                if (dualw_on && any)
+                    deviceList.add(3);
 
                 if (wifi_0.isChecked())
                     deviceList.add(0);
@@ -448,7 +461,7 @@ public class ControlActivity extends AppCompatActivity {
 
                 Controller.controlDevices = ret;
 
-                if (any && (rgbw_on || rgbww_on)) {
+                if (any && (rgbw_on || rgbww_on || dualw_on)) {
 
                     if (zone_1.isChecked() && zone_2.isChecked() && zone_3.isChecked() && zone_4.isChecked()) {
 
@@ -491,6 +504,7 @@ public class ControlActivity extends AppCompatActivity {
         wifi_0.setOnCheckedChangeListener(changeListener);
         rgb_w0.setOnCheckedChangeListener(changeListener);
         rgb_ww.setOnCheckedChangeListener(changeListener);
+        dualww.setOnCheckedChangeListener(changeListener);
         zone_1.setOnCheckedChangeListener(changeListener);
         zone_2.setOnCheckedChangeListener(changeListener);
         zone_3.setOnCheckedChangeListener(changeListener);
@@ -511,18 +525,21 @@ public class ControlActivity extends AppCompatActivity {
                     rgb_ww.setChecked(true);
                 }
                 if (iBoxSettings.hasDualW != (iBoxSettings.hasDualW = has_dualw.isChecked()) && iBoxSettings.hasDualW) {
-                    rgb_ww.setChecked(true);
+                    dualww.setChecked(true);
                 }
 
                 setElements();
 
                 List<Integer> deviceList = new ArrayList<Integer>();
 
-                if ((iBoxSettings.hasRGBWW || iBoxSettings.hasDualW) && rgb_ww.isChecked())
+                if (iBoxSettings.hasRGBWW && rgb_ww.isChecked())
                     deviceList.add(8);
 
                 if (iBoxSettings.hasRGBW && rgb_w0.isChecked())
                     deviceList.add(7);
+
+                if (iBoxSettings.hasDualW && dualww.isChecked())
+                    deviceList.add(3);
 
                 if (iBoxSettings.hasIBoxLamp && wifi_0.isChecked())
                     deviceList.add(0);
@@ -592,7 +609,7 @@ public class ControlActivity extends AppCompatActivity {
 
     private void setElements() {
 
-        if (!(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasIBoxLamp || iBoxSettings.hasDualW)) {
+        if (!(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasDualW || iBoxSettings.hasIBoxLamp)) {
 
             findViewById(R.id.hasdevice).setVisibility(View.GONE);
             findViewById(R.id.hasnodevice).setVisibility(View.VISIBLE);
@@ -602,30 +619,26 @@ public class ControlActivity extends AppCompatActivity {
             findViewById(R.id.hasnodevice).setVisibility(View.GONE);
             findViewById(R.id.hasdevice).setVisibility(View.VISIBLE);
 
-            Controller.hasRGBWW = iBoxSettings.hasRGBWW;
-
             findViewById(R.id.colorpicker_parent).setVisibility(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasIBoxLamp ? View.VISIBLE : View.GONE);
             findViewById(R.id.zone_parent).setVisibility(iBoxSettings.hasRGBW || iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
 
             findViewById(R.id.control_wifi_bridge).setVisibility(iBoxSettings.hasIBoxLamp ? View.VISIBLE : View.GONE);
             findViewById(R.id.control_rgbw).setVisibility(iBoxSettings.hasRGBW ? View.VISIBLE : View.GONE);
-
-            ((AppCompatCheckBox) findViewById(R.id.control_rgbww)).setText(iBoxSettings.hasRGBWW && iBoxSettings.hasDualW ? getString(R.string.rgbww) : (iBoxSettings.hasRGBWW ? getString(R.string.rgbww) : getString(R.string.dualw)));
-            findViewById(R.id.control_rgbww).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
-
-            findViewById(R.id.sattemp_parent).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
+            findViewById(R.id.control_rgbww).setVisibility(iBoxSettings.hasRGBWW ? View.VISIBLE : View.GONE);
+            findViewById(R.id.control_dualw).setVisibility(iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
 
             int countGroups = 0;
             if (iBoxSettings.hasIBoxLamp) countGroups++;
             if (iBoxSettings.hasRGBW) countGroups++;
-            if (iBoxSettings.hasRGBWW || iBoxSettings.hasDualW) countGroups++;
+            if (iBoxSettings.hasRGBWW) countGroups++;
+            if (iBoxSettings.hasDualW) countGroups++;
             findViewById(R.id.device_parent).setVisibility(countGroups > 1 ? View.VISIBLE : View.GONE);
 
-            ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.sattemp_parent), "warn_rgbww");
-            for (View v : views) {
-                ((TextView) v).setText(getString(R.string.rgbww_dw_only).replace("%s", iBoxSettings.hasRGBWW && iBoxSettings.hasDualW ? getString(R.string.rgbww) + " / " + getString(R.string.dualw) : getString(iBoxSettings.hasRGBWW ? R.string.rgbww : R.string.dualw)));
-                v.setVisibility(iBoxSettings.hasIBoxLamp || iBoxSettings.hasRGBW ? View.VISIBLE : View.GONE);
-            }
+            ((TextView) findViewById(R.id.warn_rgbww)).setText(getString(R.string.rgbww_dw_only).replace("%s", getString(R.string.rgbww)));
+            findViewById(R.id.sat_parent).setVisibility(iBoxSettings.hasRGBWW ? View.VISIBLE : View.GONE);
+
+            ((TextView) findViewById(R.id.warn_rgbww_dualw)).setText(getString(R.string.rgbww_dw_only).replace("%s", iBoxSettings.hasRGBWW && iBoxSettings.hasDualW ? getString(R.string.rgbww) + " / " + getString(R.string.dualw) : getString(iBoxSettings.hasRGBWW ? R.string.rgbww : R.string.dualw)));
+            findViewById(R.id.tmp_parent).setVisibility(iBoxSettings.hasRGBWW || iBoxSettings.hasDualW ? View.VISIBLE : View.GONE);
 
         }
 
@@ -635,8 +648,16 @@ public class ControlActivity extends AppCompatActivity {
         int w = 0;
         ArrayList<View> views = getViewsByTag((ViewGroup) findViewById(R.id.hasdevice), "equal");
         for (View v : views) w = Math.max(v.getMeasuredWidth(), w);
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(w, LinearLayout.LayoutParams.WRAP_CONTENT);
-        for (View v : views) v.setLayoutParams(p);
+        for (View v : views) {
+            if (v.getParent() instanceof LinearLayout) {
+                LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(w, LinearLayout.LayoutParams.WRAP_CONTENT);
+                v.setLayoutParams(p);
+            } else {
+                RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(w, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                p.setMargins(0, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6, getResources().getDisplayMetrics()), 0, 0);
+                v.setLayoutParams(p);
+            }
+        }
 
     }
 

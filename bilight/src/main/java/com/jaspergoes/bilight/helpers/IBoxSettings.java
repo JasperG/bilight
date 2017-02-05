@@ -55,11 +55,14 @@ public class IBoxSettings {
         /* On load; Propagate to Controller */
         List<Integer> deviceList = new ArrayList<Integer>();
 
-        if (hasRGBWW || hasDualW)
+        if (hasRGBWW)
             deviceList.add(8);
 
         if (hasRGBW)
             deviceList.add(7);
+
+        if (hasDualW)
+            deviceList.add(3);
 
         if (hasIBoxLamp)
             deviceList.add(0);

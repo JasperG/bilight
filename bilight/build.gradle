@@ -7,7 +7,7 @@ android {
         applicationId "com.jaspergoes.bilight"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 20
+        versionCode 23
         versionName "0.0.1"
     }
     buildTypes {

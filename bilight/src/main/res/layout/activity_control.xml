@@ -66,40 +66,57 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:id="@+id/device_parent"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:layout_height="wrap_content">
 
                             <TextView
+                                android:id="@+id/devices"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_alignParentLeft="true"
                                 android:paddingRight="6dp"
                                 android:tag="equal"
                                 android:text="@string/devices" />
 
-                            <android.support.v7.widget.AppCompatCheckBox
-                                android:id="@+id/control_wifi_bridge"
-                                android:layout_width="wrap_content"
+                            <com.jaspergoes.bilight.helpers.HorizontalFlowLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="@string/wifi_bridge"
-                                app:buttonTint="@color/colorPrimary" />
+                                android:layout_alignParentRight="true"
+                                android:layout_toRightOf="@+id/devices">
 
-                            <android.support.v7.widget.AppCompatCheckBox
-                                android:id="@+id/control_rgbw"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/rgbw"
-                                app:buttonTint="@color/colorPrimary" />
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_wifi_bridge"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/wifi_bridge"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                            <android.support.v7.widget.AppCompatCheckBox
-                                android:id="@+id/control_rgbww"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                app:buttonTint="@color/colorPrimary" />
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_rgbw"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/rgbw"
+                                    app:buttonTint="@color/colorPrimary" />
 
-                        </LinearLayout>
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_rgbww"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/rgbww"
+                                    app:buttonTint="@color/colorPrimary" />
+
+                                <android.support.v7.widget.AppCompatCheckBox
+                                    android:id="@+id/control_dualw"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/dualw"
+                                    app:buttonTint="@color/colorPrimary" />
+
+                            </com.jaspergoes.bilight.helpers.HorizontalFlowLayout>
+
+                        </RelativeLayout>
 
                         <LinearLayout
                             android:id="@+id/zone_parent"
@@ -181,7 +198,7 @@
                             app:dsb_progressColor="@color/colorPrimary" />
 
                         <LinearLayout
-                            android:id="@+id/sattemp_parent"
+                            android:id="@+id/sat_parent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
@@ -198,11 +215,11 @@
                                     android:text="@string/saturation" />
 
                                 <TextView
+                                    android:id="@+id/warn_rgbww"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_alignParentEnd="true"
-                                    android:layout_alignParentRight="true"
-                                    android:tag="warn_rgbww" />
+                                    android:layout_alignParentRight="true" />
 
                             </RelativeLayout>
 
@@ -214,6 +231,14 @@
                                 app:dsb_max="100"
                                 app:dsb_min="0"
                                 app:dsb_progressColor="@color/slider" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/tmp_parent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
                             <RelativeLayout
                                 android:layout_width="match_parent"
@@ -227,11 +252,11 @@
                                     android:text="@string/colortemp" />
 
                                 <TextView
+                                    android:id="@+id/warn_rgbww_dualw"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_alignParentEnd="true"
-                                    android:layout_alignParentRight="true"
-                                    android:tag="warn_rgbww" />
+                                    android:layout_alignParentRight="true" />
 
                             </RelativeLayout>
 

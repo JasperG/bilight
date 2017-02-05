@@ -73,8 +73,6 @@ public class Controller {
 
     private final ArrayList<byte[]> payloads = new ArrayList<byte[]>();
 
-    public static boolean hasRGBWW;
-
     /* Timestamp of last command sent; Used to detect thread death */
     public static long keepAliveTime = 0;
 
@@ -97,7 +95,7 @@ public class Controller {
     public volatile static String networkInterfaceName = "";
 
     /* The user-selection of devices and zones to be controlling */
-    public static int[] controlDevices = new int[]{8, 7, 0};
+    public static int[] controlDevices = new int[]{8, 7, 3, 0};
     public static int[] controlZones = new int[]{0};
 
     public Controller() {
@@ -536,20 +534,24 @@ public class Controller {
                                 byte[] payload;
                                 for (int i : controlDevices) {
 
-                                    dataSent = true;
+                                    if (i != 3) {
 
-                                    if (i == 0) {
+                                        dataSent = true;
 
-                                        payload = buildColorPayload(i, 0);
-                                        sendFrame(payload);
-                                        sendFrame(payload);
+                                        if (i == 0) {
 
-                                    } else {
-
-                                        for (int x : controlZones) {
-                                            payload = buildColorPayload(i, x);
+                                            payload = buildColorPayload(i, 0);
                                             sendFrame(payload);
                                             sendFrame(payload);
+
+                                        } else {
+
+                                            for (int x : controlZones) {
+                                                payload = buildColorPayload(i, x);
+                                                sendFrame(payload);
+                                                sendFrame(payload);
+                                            }
+
                                         }
 
                                     }
@@ -560,18 +562,20 @@ public class Controller {
 
                                 for (int i : controlDevices) {
 
-                                    dataSent = true;
+                                    if (i != 3) {
 
-                                    if (i == 0) {
+                                        dataSent = true;
 
-                                        sendFrame(buildColorPayload(i, 0));
+                                        if (i == 0) {
 
-                                    } else {
+                                            sendFrame(buildColorPayload(i, 0));
 
-                                        if (i == 8 && !hasRGBWW) continue;
+                                        } else {
 
-                                        for (int x : controlZones) {
-                                            sendFrame(buildColorPayload(i, x));
+                                            for (int x : controlZones) {
+                                                sendFrame(buildColorPayload(i, x));
+                                            }
+
                                         }
 
                                     }
@@ -615,6 +619,7 @@ public class Controller {
                                 dataSent = true;
 
                                 sendFrame(buildSaturationPayload(x));
+
                             }
 
                         }
@@ -654,11 +659,16 @@ public class Controller {
 
                             } else {
 
-                                for (int x : controlZones) {
+                                for (int i : controlDevices) {
 
-                                    dataSent = true;
+                                    for (int x : controlZones) {
 
-                                    sendFrame(buildWhitePayload(8, x));
+                                        dataSent = true;
+
+                                        sendFrame(buildWhitePayload(i, x));
+
+                                    }
+
                                 }
 
                             }
@@ -855,7 +865,7 @@ public class Controller {
 
     private byte[] buildWhitePayload(int group, int milightZone) {
 
-        byte[] payload = new byte[]{(byte) 128, (byte) 0, (byte) 0, (byte) 0, (byte) 17, milightSessionByte1, milightSessionByte2, (byte) 0, (byte) (-128 + noOnce), (byte) 0, (byte) 49, milightPasswordByte1, milightPasswordByte2, (byte) group, (byte) (group == 8 ? 5 : 3), (byte) (group == 8 ? (newTemperature != -1 ? newTemperature : 65) : 5), (byte) 0, (byte) 0, (byte) 0, (byte) (group == 0 ? 0 : milightZone), (byte) 0, (byte) 0};
+        byte[] payload = new byte[]{(byte) 128, (byte) 0, (byte) 0, (byte) 0, (byte) 17, milightSessionByte1, milightSessionByte2, (byte) 0, (byte) (-128 + noOnce), (byte) 0, (byte) 49, milightPasswordByte1, milightPasswordByte2, (byte) group, (byte) (group == 8 ? 5 : 3), (byte) (group == 8 || group == 3 ? (newTemperature != -1 ? newTemperature : 65) : 5), (byte) 0, (byte) 0, (byte) 0, (byte) (group == 0 ? 0 : milightZone), (byte) 0, (byte) 0};
 
 		/* Checksum */
         payload[21] = (byte) ((char) (0xFF & payload[10]) + (char) (0xFF & payload[11]) + (char) (0xFF & payload[12]) + (char) (0xFF & payload[13]) + (char) (0xFF & payload[14]) + (char) (0xFF & payload[15]) + (char) (0xFF & payload[16]) + (char) (0xFF & payload[17]) + (char) (0xFF & payload[18]) + (char) (0xFF & payload[19]) + (char) (0xFF & payload[20]));
@@ -900,7 +910,7 @@ public class Controller {
 
     private byte[] buildSwitchPayload(int group, int milightZone, boolean onOff) {
 
-        byte[] payload = new byte[]{(byte) 128, (byte) 0, (byte) 0, (byte) 0, (byte) 17, milightSessionByte1, milightSessionByte2, (byte) 0, (byte) (-128 + noOnce), (byte) 0, (byte) 49, milightPasswordByte1, milightPasswordByte2, (byte) group, (byte) (group == 8 ? 4 : 3), (byte) (group == 0 ? (onOff ? 3 : 4) : (onOff ? 1 : 2)), (byte) 0, (byte) 0, (byte) 0, (byte) (group == 0 ? 0 : milightZone), (byte) 0, (byte) 0};
+        byte[] payload = new byte[]{(byte) 128, (byte) 0, (byte) 0, (byte) 0, (byte) 17, milightSessionByte1, milightSessionByte2, (byte) 0, (byte) (-128 + noOnce), (byte) 0, (byte) 49, milightPasswordByte1, milightPasswordByte2, (byte) group, (byte) (group == 8 || group == 3 ? 4 : 3), (byte) (group == 0 || group == 3 ? (onOff ? 3 : 4) : (onOff ? 1 : 2)), (byte) 0, (byte) 0, (byte) 0, (byte) (group == 0 ? 0 : milightZone), (byte) 0, (byte) 0};
 
 		/* Checksum */
         payload[21] = (byte) ((char) (0xFF & payload[10]) + (char) (0xFF & payload[11]) + (char) (0xFF & payload[12]) + (char) (0xFF & payload[13]) + (char) (0xFF & payload[14]) + (char) (0xFF & payload[15]) + (char) (0xFF & payload[16]) + (char) (0xFF & payload[17]) + (char) (0xFF & payload[18]) + (char) (0xFF & payload[19]) + (char) (0xFF & payload[20]));
