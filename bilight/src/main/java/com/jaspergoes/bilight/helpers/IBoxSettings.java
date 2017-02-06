@@ -2,8 +2,10 @@ package com.jaspergoes.bilight.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaspergoes.bilight.milight.Controller;
 
 import org.json.JSONArray;
@@ -22,6 +24,8 @@ public class IBoxSettings {
     public boolean hasRGBW;
     public boolean hasDualW;
 
+    public String title;
+
     public IBoxSettings(Context context, String key) {
 
         this.key = key;
@@ -30,6 +34,8 @@ public class IBoxSettings {
         hasRGBWW = true;
         hasRGBW = true;
         hasDualW = true;
+
+        title = "";
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         try {
@@ -43,6 +49,7 @@ public class IBoxSettings {
                     hasRGBWW = device.getBoolean("d");
                     hasRGBW = device.getBoolean("w");
                     hasDualW = device.getBoolean("x");
+                    title = device.optString("t", "");
                 }
             }
 
@@ -50,6 +57,18 @@ public class IBoxSettings {
 
             prefs.edit().putString("devices", "[]").apply();
 
+        }
+
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        if (mFirebaseAnalytics != null) {
+            Bundle params = new Bundle();
+            params.putString("mac", key);
+            params.putString("title", title);
+            params.putString("has_lamp", hasIBoxLamp ? "yes" : "no");
+            params.putString("has_rgbw", hasRGBW ? "yes" : "no");
+            params.putString("has_rgbww", hasRGBWW ? "yes" : "no");
+            params.putString("has_dualw", hasDualW ? "yes" : "no");
+            mFirebaseAnalytics.logEvent("device_connect", params);
         }
 
         /* On load; Propagate to Controller */
@@ -103,6 +122,7 @@ public class IBoxSettings {
                     device.put("d", hasRGBWW);
                     device.put("w", hasRGBW);
                     device.put("x", hasDualW);
+                    device.put("t", title);
 
                     remoteArray.put(i, device);
 
@@ -119,6 +139,7 @@ public class IBoxSettings {
                 device.put("d", hasRGBWW);
                 device.put("w", hasRGBW);
                 device.put("x", hasDualW);
+                device.put("t", title);
                 remoteArray.put(device);
 
             }

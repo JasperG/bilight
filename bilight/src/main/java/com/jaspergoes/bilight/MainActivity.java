@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaspergoes.bilight.helpers.Constants;
 import com.jaspergoes.bilight.helpers.PortMapper;
 import com.jaspergoes.bilight.helpers.PreferenceActivityCompat;
@@ -44,7 +45,15 @@ public class MainActivity extends PreferenceActivityCompat {
 
             Device device = Controller.milightDevices.get(deviceIndex);
 
-            this.setTitle(device.addrIP);
+            String t = findName(device.addrMAC);
+
+            if (!t.equals("")) {
+                t += " | ";
+            }
+
+            t += device.addrIP;
+
+            this.setTitle(t);
             this.setSummary(device.addrMAC + (device.addrPort != Controller.defaultMilightPort ? " ( " + getString(R.string.port) + ": " + device.addrPort + " )" : ""));
 
         }
@@ -70,7 +79,15 @@ public class MainActivity extends PreferenceActivityCompat {
 
             Device device = remoteMilightDevices.get(deviceIndex);
 
-            this.setTitle(device.addrIP);
+            String t = findName(device.addrMAC);
+
+            if (!t.equals("")) {
+                t += " | ";
+            }
+
+            t += device.addrIP;
+
+            this.setTitle(t);
             this.setSummary(device.addrMAC + (device.addrPort != Controller.defaultMilightPort || device.isUPnP ? " ( " + getString(R.string.port) + ": " + device.addrPort + " " + (device.isUPnP ? "| UPnP " : "") + ")" : ""));
 
         }
@@ -177,6 +194,8 @@ public class MainActivity extends PreferenceActivityCompat {
 
     private static ArrayList<Device> remoteMilightDevices = new ArrayList<Device>();
 
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     private PreferenceCategoryCompat deviceList;
     private PreferenceCategoryCompat remoteList;
     private PreferenceCompat addRemote;
@@ -197,6 +216,8 @@ public class MainActivity extends PreferenceActivityCompat {
             }
 
         }).start();
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         // Root
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
@@ -290,7 +311,7 @@ public class MainActivity extends PreferenceActivityCompat {
         if ((l = Controller.milightDevices.size()) > 0) {
             for (i = 0; i < l; i++) {
                 LocalDevicePreference pref = new LocalDevicePreference(this, i);
-                pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
+                pref.setIcon(getResources().getDrawable(findBoxResource(Controller.milightDevices.get(i).addrMAC)));
                 pref.setEnabled(maySelect);
                 deviceList.addPreference(pref);
             }
@@ -316,12 +337,19 @@ public class MainActivity extends PreferenceActivityCompat {
                 JSONObject remote = remoteArray.getJSONObject(i);
                 remoteMilightDevices.add(new Device(remote.getString("n"), remote.getString("m"), remote.getInt("p"), remote.optBoolean("u", false)));
                 RemoteDevicePreference pref = new RemoteDevicePreference(this, i);
-                pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
+                pref.setIcon(getResources().getDrawable(findBoxResource(remoteMilightDevices.get(i).addrMAC)));
                 pref.setEnabled(maySelect);
                 remoteList.addPreference(pref);
             }
         } catch (JSONException e) {
             prefs.edit().putString("remotes", "[]").apply();
+        }
+
+        if (mFirebaseAnalytics != null) {
+            Bundle params = new Bundle();
+            params.putInt("local", Controller.milightDevices.size());
+            params.putInt("remote", remoteMilightDevices.size());
+            mFirebaseAnalytics.logEvent("device_list", params);
         }
 
     }
@@ -457,6 +485,52 @@ public class MainActivity extends PreferenceActivityCompat {
 
         updateList();
 
+    }
+
+    private String findName(String key) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        try {
+
+            JSONArray remoteArray = new JSONArray(prefs.getString("devices", "[]"));
+            for (int i = 0; i < remoteArray.length(); i++) {
+
+                JSONObject device = remoteArray.getJSONObject(i);
+                if (device.getString("m").equals(key)) {
+                    return device.optString("t", "");
+                }
+            }
+
+        } catch (JSONException e) {
+
+            prefs.edit().putString("devices", "[]").apply();
+
+        }
+
+        return "";
+    }
+
+    private int findBoxResource(String key) {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        try {
+
+            JSONArray remoteArray = new JSONArray(prefs.getString("devices", "[]"));
+            for (int i = 0; i < remoteArray.length(); i++) {
+
+                JSONObject device = remoteArray.getJSONObject(i);
+                if (device.getString("m").equals(key)) {
+                    return device.optBoolean("i", true) ? R.drawable.ic_ibox : R.drawable.ic_ibox2;
+                }
+            }
+
+        } catch (JSONException e) {
+
+            prefs.edit().putString("devices", "[]").apply();
+
+        }
+
+        return R.drawable.ic_ibox;
     }
 
 }

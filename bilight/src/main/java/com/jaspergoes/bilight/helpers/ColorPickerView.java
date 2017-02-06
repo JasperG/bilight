@@ -172,6 +172,12 @@ public class ColorPickerView extends View {
 
         mCenterPaint.setStyle(Paint.Style.FILL);
         mCenterPaint.setColor(c);
+
+        /*int r = (int) (Math.sqrt((FULL_RADIUS * FULL_RADIUS) + (FULL_RADIUS * FULL_RADIUS)) - FULL_RADIUS) / 2;
+        int y = (int) (Math.sqrt((r * r) + (r * r)) - r) / 2;
+        canvas.drawCircle(FULL_RADIUS - r + y, FULL_RADIUS - r + y, (r - y) - 1, mRadialPaint);
+        canvas.drawCircle(FULL_RADIUS - r + y, FULL_RADIUS - r + y, (r - y) - 2, mBorderPaint);*/
+
     }
 
     @Override
@@ -226,6 +232,14 @@ public class ColorPickerView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        /*int r = (int) (Math.sqrt((FULL_RADIUS * FULL_RADIUS) + (FULL_RADIUS * FULL_RADIUS)) - FULL_RADIUS) / 2;
+        int l = (int) (Math.sqrt((r * r) + (r * r)) - r) / 2;
+        int t = FULL_RADIUS - r + l;
+
+        float f = (float) Math.sqrt((event.getX() - t) * (event.getX() - t) + (event.getY() - t) + (event.getY() - t));
+
+        Log.e("BL", Float.toString(f));*/
+
         float x = event.getX() - CENTER;
         float y = event.getY() - CENTER;
 
@@ -235,6 +249,16 @@ public class ColorPickerView extends View {
 
             case MotionEvent.ACTION_DOWN:
 
+                /*if (f <= l) {
+                    mTracking = true;
+
+                    mScrollParent.setScrollingEnabled(false);
+
+                    mHighlightCenter = true;
+
+                    invalidate();
+
+                } else */
                 if (d <= CENTER) {
 
                     mTracking = true;
@@ -247,9 +271,7 @@ public class ColorPickerView extends View {
 
                         invalidate();
 
-                    }
-                    else
-                    {
+                    } else {
 
                         float angle = (float) java.lang.Math.atan2(y, x);
 

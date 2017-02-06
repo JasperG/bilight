@@ -523,6 +523,26 @@ public class Controller {
 
                         }
 
+                        /* Do saturation before color; If 'nowWhite', we'll force updating color if saturation changed */
+                        if (lastSaturation != newSaturation && newSaturation != -1) {
+
+                            lastSaturation = newSaturation;
+
+                            for (int x : controlZones) {
+
+                                dataSent = true;
+
+                                if (nowWhite) {
+                                    lastColor = -1;
+                                    lastSaturation = -1;
+                                }
+
+                                sendFrame(buildSaturationPayload(x));
+
+                            }
+
+                        }
+
                         if (lastColor != newColor && newColor != -1) {
 
                             lastColor = newColor;
@@ -605,20 +625,6 @@ public class Controller {
                                     }
 
                                 }
-
-                            }
-
-                        }
-
-                        if (lastSaturation != newSaturation && newSaturation != -1) {
-
-                            lastSaturation = newSaturation;
-
-                            for (int x : controlZones) {
-
-                                dataSent = true;
-
-                                sendFrame(buildSaturationPayload(x));
 
                             }
 

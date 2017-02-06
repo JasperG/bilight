@@ -1,5 +1,6 @@
 package com.jaspergoes.bilight;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -9,12 +10,18 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,6 +62,7 @@ public class ControlActivity extends AppCompatActivity {
         setContentView(R.layout.activity_control);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(iBoxSettings.title.trim().equals("") ? "Bilight" : iBoxSettings.title.trim() + " | Bilight");
         toolbar.setSubtitle(Controller.milightAddress.getHostAddress() + (Controller.milightPort != Controller.defaultMilightPort ? ":" + Integer.toString(Controller.milightPort) : "") + (Controller.networkInterfaceName.length() > 0 ? " " + getString(R.string.via) + " " + Controller.networkInterfaceName : ""));
         setSupportActionBar(toolbar);
 
@@ -74,6 +82,19 @@ public class ControlActivity extends AppCompatActivity {
 
                 super.onDrawerClosed(view);
 
+                ((EditText) findViewById(R.id.connect_title)).setText(iBoxSettings.title.trim());
+
+                View v = ControlActivity.this.getCurrentFocus();
+                if (v != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    v.clearFocus();
+                }
+
+                if (!iBoxSettings.title.trim().equals("")) {
+                    ((EditText) findViewById(R.id.connect_title)).setInputType(InputType.TYPE_NULL);
+                }
+
                 invalidateOptionsMenu();
 
             }
@@ -90,8 +111,6 @@ public class ControlActivity extends AppCompatActivity {
         }
 
         setCheckboxes();
-
-        ((TextView) findViewById(R.id.connect_mac)).setText(Controller.milightMac);
 
         /* Switch on */
         findViewById(R.id.switchOn).setOnClickListener(new View.OnClickListener() {
@@ -187,6 +206,49 @@ public class ControlActivity extends AppCompatActivity {
             }
 
         });
+
+        ((ImageView) findViewById(R.id.ibox_icon)).setImageResource(iBoxSettings.hasIBoxLamp ? R.drawable.ic_ibox : R.drawable.ic_ibox2);
+
+        if (iBoxSettings.title.trim().equals("")) {
+            ((EditText) findViewById(R.id.connect_title)).setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+            ((EditText) findViewById(R.id.connect_title)).setCursorVisible(true);
+        } else {
+            ((EditText) findViewById(R.id.connect_title)).setInputType(InputType.TYPE_NULL);
+        }
+
+        ((EditText) findViewById(R.id.connect_title)).setText(iBoxSettings.title);
+        ((EditText) findViewById(R.id.connect_title)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText v = (EditText) view;
+                v.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                v.setCursorVisible(true);
+                v.requestFocus();
+            }
+        });
+        ((EditText) findViewById(R.id.connect_title)).addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String t = editable.toString().trim();
+                iBoxSettings.title = t;
+                iBoxSettings.save(getApplicationContext(), Controller.milightMac);
+                getSupportActionBar().setTitle(t.equals("") ? "Bilight" : t + " | Bilight");
+            }
+
+        });
+
+        ((TextView) findViewById(R.id.connect_mac)).setText(Controller.milightMac);
 
         DiscreteSeekBar seekbar;
 
@@ -515,8 +577,11 @@ public class ControlActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-                if (iBoxSettings.hasIBoxLamp != (iBoxSettings.hasIBoxLamp = has_iboxl.isChecked()) && iBoxSettings.hasIBoxLamp) {
-                    wifi_0.setChecked(true);
+                if (iBoxSettings.hasIBoxLamp != (iBoxSettings.hasIBoxLamp = has_iboxl.isChecked())) {
+                    if (iBoxSettings.hasIBoxLamp) {
+                        wifi_0.setChecked(true);
+                    }
+                    ((ImageView) findViewById(R.id.ibox_icon)).setImageResource(iBoxSettings.hasIBoxLamp ? R.drawable.ic_ibox : R.drawable.ic_ibox2);
                 }
                 if (iBoxSettings.hasRGBW != (iBoxSettings.hasRGBW = has_rgbw0.isChecked()) && iBoxSettings.hasRGBW) {
                     rgb_w0.setChecked(true);

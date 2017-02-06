@@ -7,8 +7,8 @@ android {
         applicationId "com.jaspergoes.bilight"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 23
-        versionName "0.0.1"
+        versionCode 24
+        versionName "0.0.2"
     }
     buildTypes {
         release {
@@ -24,6 +24,7 @@ dependencies {
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.google.firebase:firebase-crash:10.0.1'
+    compile 'com.google.firebase:firebase-core:10.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

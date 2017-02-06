@@ -16,7 +16,6 @@
     <string name="devices">Apparaten</string>
     <string name="drawer_open">Openen</string>
     <string name="drawer_close">Sluiten</string>
-    <string name="milight_ibox">Milight iBox</string>
     <string name="has_ibox_lamp">iBox lamp</string>
     <string name="has_rgbw">RGBW lamp(en)</string>
     <string name="has_rgbww">RGBWW lamp(en)</string>
