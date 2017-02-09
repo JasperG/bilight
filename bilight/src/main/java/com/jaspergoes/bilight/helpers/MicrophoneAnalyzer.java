@@ -11,146 +11,125 @@ import android.util.Log;
 
 import com.jaspergoes.bilight.milight.Controller;
 
-import java.nio.ByteBuffer;
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class MicrophoneAnalyzer {
 
     private static final int RECORDING_SAMPLE_RATE = 44100;
 
-    private AudioRecord mAudioRecord;
-    private boolean mIsRecording;
-    private int mBufSize;
+    private volatile boolean mIsRecording;
 
-    private int mSamplingInterval = 40;
-    private Timer mTimer;
+    public void startRecording() {
 
-    public MicrophoneAnalyzer() {
-        initAudioRecord();
-    }
-
-    /**
-     * setter of samplingInterval
-     *
-     * @param samplingInterval interval volume sampling
-     */
-    public void setSamplingInterval(int samplingInterval) {
-        mSamplingInterval = samplingInterval;
-    }
-
-    /**
-     * getter isRecording
-     *
-     * @return true:recording, false:not recording
-     */
-    public boolean isRecording() {
-        return mIsRecording;
-    }
-
-    private void initAudioRecord() {
-        int bufferSize = AudioRecord.getMinBufferSize(
-                RECORDING_SAMPLE_RATE,
+        final int bufferSize = AudioRecord.getMinBufferSize(
+                MicrophoneAnalyzer.RECORDING_SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT
         );
 
-        mAudioRecord = new AudioRecord(
+        final AudioRecord mAudioRecord = new AudioRecord(
                 MediaRecorder.AudioSource.MIC,
-                RECORDING_SAMPLE_RATE,
+                MicrophoneAnalyzer.RECORDING_SAMPLE_RATE,
                 AudioFormat.CHANNEL_IN_MONO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 bufferSize
         );
 
         if (mAudioRecord.getState() == AudioRecord.STATE_INITIALIZED) {
-            mBufSize = bufferSize;
-        }
-    }
 
-    /**
-     * start AudioRecord.read
-     */
-    public void startRecording() {
-        mTimer = new Timer();
-        mAudioRecord.startRecording();
-        mIsRecording = true;
-        runRecording();
-    }
+            mIsRecording = true;
 
-    /**
-     * stop AudioRecord.read
-     */
-    public void stopRecording() {
-        mIsRecording = false;
-        mTimer.cancel();
-    }
+            mAudioRecord.startRecording();
 
-    public static short[] shortMe(byte[] bytes) {
-        short[] out = new short[bytes.length / 2]; // will drop last byte if odd number
-        ByteBuffer bb = ByteBuffer.wrap(bytes);
-        for (int i = 0; i < out.length; i++) {
-            out[i] = bb.getShort();
-        }
-        return out;
-    }
+            new Thread(new Runnable() {
 
-    private void runRecording() {
-        final byte buf[] = new byte[mBufSize];
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // stop recording
-                if (!mIsRecording) {
+                @Override
+                public void run() {
+
+                    /* Amount of bytes in the buffer */
+                    int bufSize = bufferSize;
+
+                    /* In 16-bit audio, each sample is 2 bytes */
+                    int numSamples = bufSize / 2;
+
+                    int readLength;
+
+                    short sampleA, sampleB;
+                    int numCrossing;
+
+                    byte buffer[] = new byte[bufSize];
+                    int p;
+
+                    while (mIsRecording) {
+
+                        /* Fill audio buffer */
+                        readLength = mAudioRecord.read(buffer, 0, bufSize);
+
+                        numCrossing = 0;
+
+                        sampleB = (short) (((buffer[0] & 0xFF) << 8) | (buffer[1] & 0xFF));
+
+                        for (p = 0; p < (readLength / 2) - 1; p++) {
+
+                            sampleA = sampleB;
+                            sampleB = (short) (((buffer[(p + 1) * 2] & 0xFF) << 8) | (buffer[((p + 1) * 2) + 1] & 0xFF));
+
+                            if ((sampleA > 0 && sampleB <= 0) || (sampleA < 0 && sampleB >= 0)) {
+                                numCrossing++;
+                            }
+
+                        }
+
+                        float frequency = ((float) numCrossing / 2) / ((float) numSamples / RECORDING_SAMPLE_RATE);
+
+                        //Log.e("LOG", Double.toString(Math.floor(Math.log(frequency / 440) / Math.log(2))));
+                        //Log.e("LOG", Double.toString(57D + (12D / Math.log(2D)) * Math.log(frequency / 440d)));
+
+                        int decibel = calculateDecibel(buffer);
+
+                        Log.e("MW", Float.toString(frequency) + " " + Integer.toString(decibel));
+
+                        Controller.newBrightness = ((decibel / 40) * 100);
+                        Controller.newColor = (int) (frequency % 256);
+
+                    }
+
                     mAudioRecord.stop();
-                    return;
-                }
-                mAudioRecord.read(buf, 0, mBufSize);
+                    mAudioRecord.release();
 
-                short[] audioData = shortMe(buf);
-                int numSamples = audioData.length;
-                int numCrossing = 0;
-                for (int p = 0; p < numSamples - 1; p++) {
-                    if ((audioData[p] > 0 && audioData[p + 1] <= 0) ||
-                            (audioData[p] < 0 && audioData[p + 1] >= 0)) {
-                        numCrossing++;
+                }
+
+            }).start();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (mIsRecording) {
+                        synchronized (Controller.INSTANCE) {
+                            Controller.INSTANCE.notify();
+                        }
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+
+                        }
                     }
                 }
+            }).start();
 
-                float numSecondsRecorded = (float) numSamples / (float) RECORDING_SAMPLE_RATE;
-                float numCycles = numCrossing / 2;
-                float frequency = numCycles / numSecondsRecorded;
+        }
 
-                int decibel = calculateDecibel(buf);
+    }
 
-                Log.e("MW", Float.toString(frequency));
-                Log.e("DECIBEL", Integer.toString(decibel));
-
-                Controller.newBrightness = ((decibel / 40) * 100);
-                Controller.newColor = (int) ((frequency / 4) % 256);
-                synchronized (Controller.INSTANCE) {
-                    Controller.INSTANCE.notify();
-                }
-            }
-        }, 0, mSamplingInterval);
+    public void stopRecording() {
+        mIsRecording = false;
     }
 
     private int calculateDecibel(byte[] buf) {
         int sum = 0;
-        for (int i = 0; i < mBufSize; i++) {
+        for (int i = 0; i < buf.length; i++) {
             sum += Math.abs(buf[i]);
         }
         // avg 10-50
-        return sum / mBufSize;
+        return sum / buf.length;
     }
 
-    /**
-     * release member object
-     */
-    public void release() {
-        stopRecording();
-        mAudioRecord.release();
-        mAudioRecord = null;
-        mTimer = null;
-    }
 }

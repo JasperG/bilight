@@ -205,21 +205,23 @@ public class ColorPickerView extends View {
         /* Take the minimum of width, or, previously calculated maximum height */
         int size = Math.min(width, mMaxHeight);
 
+        /* Subtract a pixel, as long as we cannot exactly divide by two, based on density */
+        while (((size / getResources().getDisplayMetrics().density) / 4) % 2 != 0) size -= 1;
+
         /* Set calculated size into effect */
         setMeasuredDimension(size, size);
 
         /* Calculate sizes of elements to draw on canvas */
         CENTER = size / 2;
 
-        /* Set the shader for the shadow around the ColorPickerView now we know it's size */
-        mShadowPaint.setShader(new RadialGradient(0, 0, CENTER, new int[]{0xff000000, 0x00000000}, new float[]{0.98f, 1f}, Shader.TileMode.MIRROR));
-
-        /* Subtract a 10 density dependent pixels from the element's size, leaving room for shadow
-         * Effectively creating a 5dp padding */
-        size -= 10;
+        /* Subtract a padding from the element's size, leaving room for shadow */
+        size -= (int) (Math.ceil(1.5 * getResources().getDisplayMetrics().density) * 2);
 
         /* Set the radius of the color spectrum to draw */
         FULL_RADIUS = size / 2;
+
+        /* Set the shader for the shadow around the ColorPickerView now we know it's size */
+        mShadowPaint.setShader(new RadialGradient(0, 0, CENTER, new int[]{0xff000000, 0x00000000}, new float[]{((float) FULL_RADIUS / (float) CENTER), 1f}, Shader.TileMode.MIRROR));
 
         /* Set the radius of the inner selected color to draw */
         CENTER_RADIUS = (int) (0.28 * size);

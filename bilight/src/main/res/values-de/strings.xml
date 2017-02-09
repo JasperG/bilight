@@ -8,7 +8,7 @@
     <string name="add_remote_device">Add Remote Device</string>
     <string name="add_remote_device_summary">Specify an IP address and Port to connect to a Milight device remotely.</string>
     <string name="remote_instructions">To use this, you need to forward incoming UDP packets on your router to the local IP address of your Milight iBox1 or iBox2 at port 5987.\nFor now; After pressing the "Connect" button, the connection will be saved to the list *only* if a connection could be established.</string>
-    <string name="discover_attempt">Please wait. Discovering, or, attempting connection..\nMax 16 seconds for an iBox to respond.</string>
+    <string name="discover_attempt">Please wait. Discovering, or, attempting connection..\nMax 12 seconds for an iBox to respond.</string>
     <string name="ip_local_warn">The IP address you entered apppears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
     <string name="colortemp">White Temperature</string>
     <string name="rgbw">RGBW</string>

@@ -69,12 +69,10 @@ public class Controller {
     public volatile static boolean isConnecting;
 
     /* Whether we are connected */
-    private volatile static boolean isConnected;
+    public volatile static boolean isConnected;
 
+    /* Used to have the workerthread send preformed frames */
     private final ArrayList<byte[]> payloads = new ArrayList<byte[]>();
-
-    /* Timestamp of last command sent; Used to detect thread death */
-    public static long keepAliveTime = 0;
 
     /* Whether the lamps are in WHITE mode */
     public static boolean nowWhite = false;
@@ -204,10 +202,10 @@ public class Controller {
             }
 
 			/* Note:
-             * We'll spend eight seconds waiting for the first device to answer.
-			 * We'll spend no more than four seconds once the first device has been found.
-			 * If there's been no answer after eight seconds, we'll retry the whole thing, once.
-			 * Max 16 seconds for discovery, or, show an error dialog afterwards. */
+             * We'll spend four seconds waiting for the first device to answer.
+			 * We'll spend no more than two seconds once the first device has been found.
+			 * If there's been no answer after four seconds, we'll retry the whole thing, twice.
+			 * Max 12 seconds for discovery. */
 
 			/* Keep listening for incoming packets for at least four seconds, or eight while no devices are found */
             long timeout = System.currentTimeMillis();
@@ -244,31 +242,16 @@ public class Controller {
                 }
 
             }
-            while (System.currentTimeMillis() - timeout < (milightDevices.size() == 0 ? 8000 : 4000));
+            while (System.currentTimeMillis() - timeout < (milightDevices.size() == 0 ? 4000 : 2000));
 
         }
-        while (milightDevices.size() == 0 && ++attempts < 2);
+        while (milightDevices.size() == 0 && ++attempts < 3);
 
     }
 
     public void setDevice(String address, int port, boolean upnp, Context context) {
 
         isConnecting = true;
-
-        /* Close any previously opened socket */
-        if (socket != null) socket.close();
-
-		/* Bind new socket to any address - assuming android handles this right */
-        try {
-
-            socket = new DatagramSocket(localPort);
-            socket.setSoTimeout(1000);
-
-        } catch (SocketException e) {
-
-            Log.e("BILIGHT", "Could not bind to port " + Integer.toString(localPort) + ".");
-
-        }
 
         context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
@@ -288,21 +271,48 @@ public class Controller {
 
         }
 
+        /* Close any previously opened socket */
+        if (socket != null) socket.close();
+
+		/* Bind new socket to any address - assuming android handles this right */
         try {
+
+            socket = new DatagramSocket(localPort);
+            socket.setSoTimeout(1000);
+
+        } catch (SocketException e) {
+
+            Log.e("BILIGHT", "Could not bind to port " + Integer.toString(localPort) + ".");
+            isConnecting = false;
+            context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
+
+            return;
+
+        }
+
+        try {
+
             milightAddress = InetAddress.getByName(address);
             milightPort = port;
+
         } catch (UnknownHostException e) {
+
             Log.e("BILIGHT", "INVALID HOST");
             isConnecting = false;
             context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
+
             return;
+
         }
 
         byte[] payload = new byte[]{(byte) 32, (byte) 0, (byte) 0, (byte) 0, (byte) 22, (byte) 2, (byte) 98, (byte) 58, (byte) 213, (byte) 237, (byte) 163, (byte) 1, (byte) 174, (byte) 8, (byte) 45, (byte) 70, (byte) 97, (byte) 65, (byte) 167, (byte) 246, (byte) 220, (byte) 175, (byte) 211, (byte) 230, (byte) 0, (byte) 0, (byte) 30};
 
         try {
+
             socket.send(new DatagramPacket(payload, 27, milightAddress, milightPort));
+
         } catch (IOException e) {
+
         }
 
         byte[] buffer = new byte[64];
@@ -314,6 +324,7 @@ public class Controller {
         do {
 
             try {
+
                 socket.receive(packet);
 
 				/* Check if the packet came from the selected device, and the received response is as expected */
@@ -395,29 +406,25 @@ public class Controller {
                     isConnecting = false;
 
                     context.sendBroadcast(new Intent(Constants.BILIGHT_DEVICE_CONNECTED));
+
                 }
 
             } catch (IOException e) {
             }
 
-        }
-        while (!isConnected && timeout - System.currentTimeMillis() > 0);
+        } while (!isConnected && timeout - System.currentTimeMillis() > 0);
 
         if (!isConnected) {
 
-            //socket.close();
-
-            //ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().createImage(ClassLoader.getSystemResource("ibox.png")));
-            //JOptionPane.showMessageDialog(null, "Could not establish a connection to the WiFi iBox1 ( v6 ) on your network within 10 seconds.\n\nRestart the application to retry.\n\nTerminating.", WindowHelper.appTitle, JOptionPane.ERROR_MESSAGE, icon);
             Log.e("BILIGHT", "Could not establish a connection to the WiFi iBox1 ( v6 ) on your network within 10 seconds.");
-            // System.exit(0);
-
             isConnecting = false;
             context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
         } else {
-            /* Start keepalive thread */
+
+            /* Start worker thread */
             startWorkerThread();
+
         }
 
     }
@@ -431,11 +438,11 @@ public class Controller {
         byte[] buffer = new byte[64];
         DatagramPacket packet = new DatagramPacket(buffer, 64);
 
-        try {
+        int sendAttempts = 0;
 
-            int sendAttempts = 0;
+        do {
 
-            do {
+            try {
 
 				/* Send a useless color payload with an incorrect set of password-bytes */
                 socket.send(new DatagramPacket(buildColorPayload(0, 0), 22, milightAddress, milightPort));
@@ -469,17 +476,19 @@ public class Controller {
                     } catch (SocketTimeoutException e) {
                     }
 
-                }
-                while (++receiveAttempts < 2);
+                } while (++receiveAttempts < 2);
 
+            } catch (IOException e) {
+                /* This should never happen */
             }
-            while (++sendAttempts < 2);
 
-        } catch (IOException e) {
-            /* This should never happen */
-        }
+        } while (++sendAttempts < 2);
 
         System.out.println("Could not retrieve password bytes.");
+
+        /* Set most likely values on failure */
+        milightPasswordByte1 = (byte) 0;
+        milightPasswordByte2 = (byte) 0;
 
     }
 
@@ -491,6 +500,7 @@ public class Controller {
             public void run() {
 
                 boolean keepAlive = false;
+                long keepAliveTime = System.currentTimeMillis() + 5000;
                 long wait;
 
                 boolean dataSent;
@@ -769,10 +779,30 @@ public class Controller {
     }
 
     public static void disconnect() {
+
         if (socket != null) {
+
             isConnected = false;
+
+            if (Controller.INSTANCE != null) {
+
+                synchronized (Controller.INSTANCE) {
+                    Controller.INSTANCE.notify();
+                }
+
+            }
+
+            // Wait 0.2 seconds for old packets to propagate
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+            }
+
             socket.close();
+            socket = null;
+
         }
+
     }
 
     private byte[] buildColorPayload(int deviceGroup, int milightZone) {

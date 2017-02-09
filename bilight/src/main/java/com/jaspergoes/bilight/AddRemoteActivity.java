@@ -27,6 +27,12 @@ public class AddRemoteActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+        /* Should not be able to get here, if Controller has not been instantiated in MainActivity */
+        if (Controller.INSTANCE == null) {
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_add_remote);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
 
@@ -62,6 +68,7 @@ public class AddRemoteActivity extends AppCompatActivity {
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Controller.isConnecting = true;
                 new Thread(new Runnable() {
                     @Override
                     public void run() {

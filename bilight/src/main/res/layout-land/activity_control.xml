@@ -28,7 +28,10 @@
             <com.jaspergoes.bilight.helpers.ScrollViewPlus
                 android:id="@+id/scrollcontent"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="fill_parent"
+                android:fadingEdge="none"
+                android:overScrollMode="never"
+                android:requiresFadingEdge="none">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -325,7 +328,10 @@
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:fadingEdge="none"
+                android:overScrollMode="never"
+                android:requiresFadingEdge="none">
 
                 <LinearLayout
                     android:layout_width="match_parent"

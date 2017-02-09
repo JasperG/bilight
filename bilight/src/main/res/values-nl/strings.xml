@@ -8,7 +8,7 @@
     <string name="add_remote_device">Apparaat op Afstand toevoegen</string>
     <string name="add_remote_device_summary">Handmatig een IP-adres en Poort invullen om op afstand te verbinden met een Milight apparaat.</string>
     <string name="remote_instructions">Om dit te gebruiken, moeten UDP pakketten op de router worden doorgestuurd naar het lokale IP-adres van de Milight iBox1 of iBox2 op poort 5987.\nFor now; After pressing the "Connect" button, the connection will be saved to the list *only* if a connection could be established.</string>
-    <string name="discover_attempt">Even geduld. Ontdekking, of, poging tot connectie wordt uitgevoerd.\nMax 16 seconden wachten tot een iBox reageert.</string>
+    <string name="discover_attempt">Even geduld. Ontdekking, of, poging tot connectie wordt uitgevoerd.\nMax 12 seconden wachten tot een iBox reageert.</string>
     <string name="ip_local_warn">The IP address you entered apppears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
     <string name="colortemp">Wit Temperatuur</string>
     <string name="rgbw">RGBW</string>

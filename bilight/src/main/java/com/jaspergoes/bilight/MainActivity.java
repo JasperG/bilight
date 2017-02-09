@@ -206,16 +206,20 @@ public class MainActivity extends PreferenceActivityCompat {
 
         super.onCreate(bundle);
 
-        new Controller();
+        if (Controller.INSTANCE == null) {
+            new Controller();
+        }
 
-        new Thread(new Runnable() {
+        if (!Controller.isConnecting) {
+            new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                Controller.INSTANCE.discoverNetworks(getApplicationContext());
-            }
+                @Override
+                public void run() {
+                    Controller.INSTANCE.discoverNetworks(getApplicationContext());
+                }
 
-        }).start();
+            }).start();
+        }
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
@@ -367,18 +371,22 @@ public class MainActivity extends PreferenceActivityCompat {
         boolean hasRemoteConnectionConfigured = false;
         boolean hasRemoteViaUPnP = false;
 
+        int pPort = 0;
         for (Device remoteDevice : remoteMilightDevices) {
 
             if (addressMac.equals(remoteDevice.addrMAC)) {
 
                 hasRemoteConnectionConfigured = true;
                 hasRemoteViaUPnP = remoteDevice.isUPnP;
+                pPort = remoteDevice.addrPort;
 
                 break;
 
             }
 
         }
+
+        final int preferredPort = pPort;
 
         /* We already have this device saved as a UPnP connection - Make sure to update lease */
         if (hasRemoteViaUPnP) {
@@ -403,6 +411,11 @@ public class MainActivity extends PreferenceActivityCompat {
 
                             /* No mapped port yet (or, any more) */
                             /* Remote entry should, perhaps, be removed here */
+                            if (preferredPort != 0) {
+
+                                Log.e("RESET LEASE", PortMapper.mapPort("", preferredPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
+
+                            }
 
                         } else {
 

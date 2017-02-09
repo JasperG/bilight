@@ -43,6 +43,7 @@ public class ControlActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private LinearLayout mDrawerPanel;
+    //private MicrophoneAnalyzer mic;
 
     private IBoxSettings iBoxSettings;
 
@@ -52,7 +53,7 @@ public class ControlActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         /* Expect this value to be null after some time - Thread will eventually be terminated, of course. Should be done nicer than this, but whatever. */
-        if (Controller.milightAddress == null || (Controller.keepAliveTime != 0 && Controller.keepAliveTime < (System.currentTimeMillis() - 6e4))) {
+        if (Controller.milightAddress == null || !Controller.isConnected) {
             finish();
             return;
         }
@@ -171,9 +172,8 @@ public class ControlActivity extends AppCompatActivity {
             }
         });
 
-        /* Audio analyzer | just trying out some stuff */
-        // MicrophoneAnalyzer mic = new MicrophoneAnalyzer();
-        // mic.startRecording();
+        /* Audio analyzer */
+        // mic = new MicrophoneAnalyzer();
 
         /* Color */
         TypedArray array = getTheme().obtainStyledAttributes(new int[]{android.R.attr.colorBackground});
@@ -333,7 +333,7 @@ public class ControlActivity extends AppCompatActivity {
         super.onResume();
 
         /* Expect this value to be null after some time - Thread will eventually be terminated, of course. Should be done nicer than this, but whatever. */
-        if (Controller.milightAddress == null || (Controller.keepAliveTime != 0 && Controller.keepAliveTime < (System.currentTimeMillis() - 6e4))) {
+        if (Controller.milightAddress == null || !Controller.isConnected) {
             finish();
         }
 
@@ -381,7 +381,16 @@ public class ControlActivity extends AppCompatActivity {
         super.onStop();
 
         if (isFinishing()) {
-            Controller.disconnect();
+
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    Controller.disconnect();
+                }
+
+            }).start();
+
         }
 
     }
