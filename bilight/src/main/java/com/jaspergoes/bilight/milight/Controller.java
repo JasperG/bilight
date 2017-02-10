@@ -305,118 +305,128 @@ public class Controller {
 
         }
 
-        byte[] payload = new byte[]{(byte) 32, (byte) 0, (byte) 0, (byte) 0, (byte) 22, (byte) 2, (byte) 98, (byte) 58, (byte) 213, (byte) 237, (byte) 163, (byte) 1, (byte) 174, (byte) 8, (byte) 45, (byte) 70, (byte) 97, (byte) 65, (byte) 167, (byte) 246, (byte) 220, (byte) 175, (byte) 211, (byte) 230, (byte) 0, (byte) 0, (byte) 30};
-
-        try {
-
-            socket.send(new DatagramPacket(payload, 27, milightAddress, milightPort));
-
-        } catch (IOException e) {
-
-        }
-
         byte[] buffer = new byte[64];
         DatagramPacket packet = new DatagramPacket(buffer, 64);
 
-		/* Keep listening for incoming packets for ten seconds */
-        long timeout = System.currentTimeMillis() + 10000;
+        byte[] payload = new byte[]{(byte) 32, (byte) 0, (byte) 0, (byte) 0, (byte) 22, (byte) 2, (byte) 98, (byte) 58, (byte) 213, (byte) 237, (byte) 163, (byte) 1, (byte) 174, (byte) 8, (byte) 45, (byte) 70, (byte) 97, (byte) 65, (byte) 167, (byte) 246, (byte) 220, (byte) 175, (byte) 211, (byte) 230, (byte) 0, (byte) 0, (byte) 30};
+
+        /* Keep retrying connection for twelve seconds ( three cycles ) */
+        long timeout = System.currentTimeMillis() + 12000;
 
         do {
 
             try {
 
-                socket.receive(packet);
-
-				/* Check if the packet came from the selected device, and the received response is as expected */
-                if (packet.getAddress().equals(milightAddress) && bytesToHex(buffer, packet.getLength()).indexOf("2800000011") == 0) {
-
-                    String hostAddr = milightAddress.getHostAddress();
-
-                    /* Check if this is a local device */
-                    boolean found = false;
-                    for (int i = 0; i < milightDevices.size(); i++) {
-                        if (milightDevices.get(i).addrIP.equals(hostAddr)) {
-                            milightMac = milightDevices.get(i).addrMAC;
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    /* Remote device */
-                    if (!found) {
-
-                        String hostMac = bytesToHex(buffer, packet.getLength()).substring(14, 14 + 12).replaceAll("(.{2})", "$1" + ':').substring(0, 17);
-                        milightMac = hostMac;
-                        boolean changed = false;
-
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                        try {
-
-                            JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
-                            for (int i = 0; i < remoteArray.length(); i++) {
-                                JSONObject remote = remoteArray.getJSONObject(i);
-                                if (remote.getString("n").equals(hostAddr) && remote.optInt("p", -1) == milightPort) {
-
-                                    if (!remote.optString("m", "").equals(hostMac)) {
-                                        remote.put("m", hostMac);
-                                        remoteArray.put(i, remote);
-                                        changed = true;
-                                    }
-
-                                    found = true;
-                                    break;
-
-                                }
-                            }
-
-                            if (!found) {
-
-                                JSONObject n = new JSONObject();
-                                n.put("n", hostAddr);
-                                n.put("m", hostMac);
-                                n.put("p", milightPort);
-                                n.put("u", upnp);
-                                remoteArray.put(n);
-
-                                changed = true;
-
-                            }
-
-                            if (changed) {
-
-                                prefs.edit().putString("remotes", remoteArray.toString()).apply();
-
-                            }
-
-                        } catch (JSONException e) {
-
-                            prefs.edit().putString("remotes", "[]").apply();
-
-                        }
-
-                    }
-
-                    milightSessionByte1 = buffer[19];
-                    milightSessionByte2 = buffer[20];
-
-					/* Discover password bytes before setting isConnected to true */
-                    passwordDiscovery();
-
-                    isConnected = true;
-                    isConnecting = false;
-
-                    context.sendBroadcast(new Intent(Constants.BILIGHT_DEVICE_CONNECTED));
-
-                }
+                socket.send(new DatagramPacket(payload, 27, milightAddress, milightPort));
 
             } catch (IOException e) {
+
+                Log.e("BILIGHT", "Could not send payload to establish connection.");
+                continue;
+
             }
+
+            /* Keep listening for incoming packets for four seconds */
+            long innerTimeout = System.currentTimeMillis() + 4000;
+
+            do {
+
+                try {
+
+                    socket.receive(packet);
+
+				    /* Check if the packet came from the selected device, and the received response is as expected */
+                    if (packet.getAddress().equals(milightAddress) && bytesToHex(buffer, packet.getLength()).indexOf("2800000011") == 0) {
+
+                        String hostAddr = milightAddress.getHostAddress();
+
+                        /* Check if this is a local device */
+                        boolean found = false;
+                        for (int i = 0; i < milightDevices.size(); i++) {
+                            if (milightDevices.get(i).addrIP.equals(hostAddr)) {
+                                milightMac = milightDevices.get(i).addrMAC;
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        /* Remote device */
+                        if (!found) {
+
+                            String hostMac = bytesToHex(buffer, packet.getLength()).substring(14, 14 + 12).replaceAll("(.{2})", "$1" + ':').substring(0, 17);
+                            milightMac = hostMac;
+                            boolean changed = false;
+
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                            try {
+
+                                JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
+                                for (int i = 0; i < remoteArray.length(); i++) {
+                                    JSONObject remote = remoteArray.getJSONObject(i);
+                                    if (remote.getString("n").equals(hostAddr) && remote.optInt("p", -1) == milightPort) {
+
+                                        if (!remote.optString("m", "").equals(hostMac)) {
+                                            remote.put("m", hostMac);
+                                            remoteArray.put(i, remote);
+                                            changed = true;
+                                        }
+
+                                        found = true;
+                                        break;
+
+                                    }
+                                }
+
+                                if (!found) {
+
+                                    JSONObject n = new JSONObject();
+                                    n.put("n", hostAddr);
+                                    n.put("m", hostMac);
+                                    n.put("p", milightPort);
+                                    n.put("u", upnp);
+                                    remoteArray.put(n);
+
+                                    changed = true;
+
+                                }
+
+                                if (changed) {
+
+                                    prefs.edit().putString("remotes", remoteArray.toString()).apply();
+
+                                }
+
+                            } catch (JSONException e) {
+
+                                prefs.edit().putString("remotes", "[]").apply();
+
+                            }
+
+                        }
+
+                        milightSessionByte1 = buffer[19];
+                        milightSessionByte2 = buffer[20];
+
+					/* Discover password bytes before setting isConnected to true */
+                        passwordDiscovery();
+
+                        isConnected = true;
+                        isConnecting = false;
+
+                        context.sendBroadcast(new Intent(Constants.BILIGHT_DEVICE_CONNECTED));
+
+                    }
+
+                } catch (IOException e) {
+                }
+
+            } while (!isConnected && innerTimeout - System.currentTimeMillis() > 0);
 
         } while (!isConnected && timeout - System.currentTimeMillis() > 0);
 
         if (!isConnected) {
 
-            Log.e("BILIGHT", "Could not establish a connection to the WiFi iBox1 ( v6 ) on your network within 10 seconds.");
+            Log.e("BILIGHT", "Could not establish a connection to the WiFi iBox1 ( v6 ) on your network within 12 seconds.");
             isConnecting = false;
             context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
