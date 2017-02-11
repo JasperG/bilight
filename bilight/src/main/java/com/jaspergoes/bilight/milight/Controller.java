@@ -100,10 +100,13 @@ public class Controller {
         INSTANCE = this;
     }
 
+    private static ArrayList<InetAddress> broadcastAddresses = new ArrayList<InetAddress>();
+
     public void discoverNetworks(final Context context) {
 
         networkInterfaceName = "";
         milightDevices.clear();
+        broadcastAddresses.clear();
         isConnecting = true;
 
         int triedInterfaces = 0;
@@ -129,6 +132,8 @@ public class Controller {
                     context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
                     triedInterfaces++;
+
+                    broadcastAddresses.add(broadcastAddress);
 
                     discoverDevices(localAddress, broadcastAddress, context);
 
@@ -165,8 +170,6 @@ public class Controller {
 
     }
 
-    private static InetAddress stephaneTest;
-
     private void discoverDevices(InetAddress localAddress, InetAddress broadcastAddress, Context context) {
 
 		/* Close any previously opened socket */
@@ -177,8 +180,6 @@ public class Controller {
 
             socket = new DatagramSocket(localPort, localAddress);
             socket.setSoTimeout(1000);
-
-            stephaneTest = localAddress;
 
         } catch (SocketException e) {
 
@@ -280,14 +281,9 @@ public class Controller {
 
 		/* Bind new socket to any address - assuming android handles this right */
         try {
-            if (stephaneTest != null) {
-                Log.e("BILIGHT", "SPECIFICALLY BINDING TO LOCAL ADDRESS " + stephaneTest.getHostAddress());
-                socket = new DatagramSocket(localPort, stephaneTest);
-            } else {
-                Log.e("BILIGHT", "BINDING TO WILDCARD ADDRESS");
-                socket = new DatagramSocket(localPort);
-            }
-            socket.setSoTimeout(2000);
+
+            socket = new DatagramSocket(localPort);
+            socket.setSoTimeout(1000);
 
         } catch (SocketException e) {
 
@@ -300,11 +296,6 @@ public class Controller {
         }
 
         Log.e("BILIGHT", "LOCAL SOCKET BOUND TO: " + socket.getLocalAddress().getHostAddress());
-        try {
-            Log.e("BILIGHT", "SOCKET RECEIVE BUFFER SIZE: " + socket.getReceiveBufferSize());
-        } catch (SocketException e) {
-            Log.e("BILIGHT", "COULD NOT GET RECEIVE BUFFER SIZE");
-        }
 
         try {
 
@@ -324,7 +315,28 @@ public class Controller {
         byte[] buffer = new byte[64];
         DatagramPacket packet = new DatagramPacket(buffer, 64);
 
-        byte[] payload = new byte[]{(byte) 32, (byte) 0, (byte) 0, (byte) 0, (byte) 22, (byte) 2, (byte) 98, (byte) 58, (byte) 213, (byte) 237, (byte) 163, (byte) 1, (byte) 174, (byte) 8, (byte) 45, (byte) 70, (byte) 97, (byte) 65, (byte) 167, (byte) 246, (byte) 220, (byte) 175, (byte) 211, (byte) 230, (byte) 0, (byte) 0, (byte) 30};
+        byte[] payload;
+
+        /* Broadcast first to avoid router filtering unsollicited packets */
+        payload = new byte[]{(byte) 16, (byte) 0, (byte) 0, (byte) 0, (byte) 36, (byte) 2, (byte) -75, (byte) -90, (byte) 2, (byte) 57, (byte) 56, (byte) 53, (byte) 98, (byte) 49, (byte) 53, (byte) 55, (byte) 98, (byte) 102, (byte) 54, (byte) 102, (byte) 99, (byte) 52, (byte) 51, (byte) 51, (byte) 54, (byte) 56, (byte) 97, (byte) 54, (byte) 51, (byte) 52, (byte) 54, (byte) 55, (byte) 101, (byte) 97, (byte) 51, (byte) 98, (byte) 49, (byte) 57, (byte) 100, (byte) 48, (byte) 100};
+
+        for (InetAddress addr : broadcastAddresses) {
+
+            for (int i = 0; i < 2; i++) {
+
+                try {
+                    socket.send(new DatagramPacket(payload, payload.length, addr, defaultMilightPort));
+                    Log.e("BILIGHT", "BROADCAST SENT ONTO ADDR " + addr.getHostAddress());
+                } catch (IOException e) {
+                    i = 2;
+                    Log.e("BILIGHT", "BROADCAST ADDR " + addr.getHostAddress() + " IOEXCEPTION " + e.toString());
+                }
+
+            }
+
+        }
+
+        payload = new byte[]{(byte) 32, (byte) 0, (byte) 0, (byte) 0, (byte) 22, (byte) 2, (byte) 98, (byte) 58, (byte) 213, (byte) 237, (byte) 163, (byte) 1, (byte) 174, (byte) 8, (byte) 45, (byte) 70, (byte) 97, (byte) 65, (byte) 167, (byte) 246, (byte) 220, (byte) 175, (byte) 211, (byte) 230, (byte) 0, (byte) 0, (byte) 30};
 
         /* Keep retrying connection for twelve seconds ( three cycles ) */
         long timeout = System.currentTimeMillis() + 12000;
@@ -332,6 +344,7 @@ public class Controller {
         do {
 
             try {
+
                 Log.e("BILIGHT", "SENDING PAYLOAD");
                 socket.send(new DatagramPacket(payload, 27, milightAddress, milightPort));
 
@@ -460,6 +473,7 @@ public class Controller {
                 } catch (IOException e) {
 
                     Log.e("BILIGHT", "IOEXCEPTION " + e.toString());
+
                 }
 
             } while (!isConnected && innerTimeout - System.currentTimeMillis() > 0);
@@ -827,33 +841,6 @@ public class Controller {
             }
 
         }.start();
-
-    }
-
-    public static void disconnect() {
-
-        if (socket != null) {
-
-            isConnected = false;
-
-            if (Controller.INSTANCE != null) {
-
-                synchronized (Controller.INSTANCE) {
-                    Controller.INSTANCE.notify();
-                }
-
-            }
-
-            // Wait 0.2 seconds for old packets to propagate
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-            }
-
-            socket.close();
-            socket = null;
-
-        }
 
     }
 

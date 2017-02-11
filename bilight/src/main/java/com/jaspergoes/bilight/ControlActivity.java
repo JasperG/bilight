@@ -382,14 +382,15 @@ public class ControlActivity extends AppCompatActivity {
 
         if (isFinishing()) {
 
-            new Thread(new Runnable() {
+            Controller.isConnected = false;
 
-                @Override
-                public void run() {
-                    Controller.disconnect();
+            if (Controller.INSTANCE != null) {
+
+                synchronized (Controller.INSTANCE) {
+                    Controller.INSTANCE.notify();
                 }
 
-            }).start();
+            }
 
         }
 
