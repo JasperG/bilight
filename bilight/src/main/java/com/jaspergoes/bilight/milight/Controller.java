@@ -65,6 +65,9 @@ public class Controller {
     /* List of all found wifi bridges */
     public static ArrayList<Device> milightDevices = new ArrayList<Device>();
 
+    /* Pool of broadcast addresses to use when setting up connection */
+    private static ArrayList<InetAddress> broadcastAddrPool = new ArrayList<InetAddress>();
+
     /* Whether we are connecting */
     public volatile static boolean isConnecting;
 
@@ -100,13 +103,11 @@ public class Controller {
         INSTANCE = this;
     }
 
-    private static ArrayList<InetAddress> broadcastAddresses = new ArrayList<InetAddress>();
-
     public void discoverNetworks(final Context context) {
 
         networkInterfaceName = "";
         milightDevices.clear();
-        broadcastAddresses.clear();
+        broadcastAddrPool.clear();
         isConnecting = true;
 
         int triedInterfaces = 0;
@@ -133,7 +134,7 @@ public class Controller {
 
                     triedInterfaces++;
 
-                    broadcastAddresses.add(broadcastAddress);
+                    broadcastAddrPool.add(broadcastAddress);
 
                     discoverDevices(localAddress, broadcastAddress, context);
 
@@ -210,7 +211,7 @@ public class Controller {
              * We'll spend four seconds waiting for the first device to answer.
 			 * We'll spend no more than two seconds once the first device has been found.
 			 * If there's been no answer after four seconds, we'll retry the whole thing, twice.
-			 * Max 12 seconds for discovery. */
+			 * That makes max 12 seconds for discovery. */
 
 			/* Keep listening for incoming packets for at least four seconds, or eight while no devices are found */
             long timeout = System.currentTimeMillis();
@@ -320,16 +321,19 @@ public class Controller {
         /* Broadcast first to avoid router filtering unsollicited packets */
         payload = new byte[]{(byte) 16, (byte) 0, (byte) 0, (byte) 0, (byte) 36, (byte) 2, (byte) -75, (byte) -90, (byte) 2, (byte) 57, (byte) 56, (byte) 53, (byte) 98, (byte) 49, (byte) 53, (byte) 55, (byte) 98, (byte) 102, (byte) 54, (byte) 102, (byte) 99, (byte) 52, (byte) 51, (byte) 51, (byte) 54, (byte) 56, (byte) 97, (byte) 54, (byte) 51, (byte) 52, (byte) 54, (byte) 55, (byte) 101, (byte) 97, (byte) 51, (byte) 98, (byte) 49, (byte) 57, (byte) 100, (byte) 48, (byte) 100};
 
-        for (InetAddress addr : broadcastAddresses) {
+        for (InetAddress addr : broadcastAddrPool) {
 
             for (int i = 0; i < 2; i++) {
 
                 try {
                     socket.send(new DatagramPacket(payload, payload.length, addr, defaultMilightPort));
                     Log.e("BILIGHT", "BROADCAST SENT ONTO ADDR " + addr.getHostAddress());
+                    Thread.sleep(150);
                 } catch (IOException e) {
                     i = 2;
                     Log.e("BILIGHT", "BROADCAST ADDR " + addr.getHostAddress() + " IOEXCEPTION " + e.toString());
+                } catch (InterruptedException e) {
+                    /* Will never happen unless app destroyed */
                 }
 
             }
