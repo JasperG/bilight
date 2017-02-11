@@ -165,6 +165,8 @@ public class Controller {
 
     }
 
+    private static InetAddress stephaneTest;
+
     private void discoverDevices(InetAddress localAddress, InetAddress broadcastAddress, Context context) {
 
 		/* Close any previously opened socket */
@@ -175,6 +177,8 @@ public class Controller {
 
             socket = new DatagramSocket(localPort, localAddress);
             socket.setSoTimeout(1000);
+
+            stephaneTest = localAddress;
 
         } catch (SocketException e) {
 
@@ -276,9 +280,14 @@ public class Controller {
 
 		/* Bind new socket to any address - assuming android handles this right */
         try {
-
-            socket = new DatagramSocket(localPort);
-            socket.setSoTimeout(1000);
+            if (stephaneTest != null) {
+                Log.e("BILIGHT", "SPECIFICALLY BINDING TO LOCAL ADDRESS " + stephaneTest.getHostAddress());
+                socket = new DatagramSocket(localPort, stephaneTest);
+            } else {
+                Log.e("BILIGHT", "BINDING TO WILDCARD ADDRESS");
+                socket = new DatagramSocket(localPort);
+            }
+            socket.setSoTimeout(2000);
 
         } catch (SocketException e) {
 
@@ -288,6 +297,13 @@ public class Controller {
 
             return;
 
+        }
+
+        Log.e("BILIGHT", "LOCAL SOCKET BOUND TO: " + socket.getLocalAddress().getHostAddress());
+        try {
+            Log.e("BILIGHT", "SOCKET RECEIVE BUFFER SIZE: " + socket.getReceiveBufferSize());
+        } catch (SocketException e) {
+            Log.e("BILIGHT", "COULD NOT GET RECEIVE BUFFER SIZE");
         }
 
         try {
@@ -316,7 +332,7 @@ public class Controller {
         do {
 
             try {
-                Log.e("BILIGHT RECEIVED PACK", "SENDING PAYLOAD");
+                Log.e("BILIGHT", "SENDING PAYLOAD");
                 socket.send(new DatagramPacket(payload, 27, milightAddress, milightPort));
 
             } catch (IOException e) {
