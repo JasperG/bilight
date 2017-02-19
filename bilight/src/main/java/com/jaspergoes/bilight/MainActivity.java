@@ -371,14 +371,14 @@ public class MainActivity extends PreferenceActivityCompat {
         boolean hasRemoteConnectionConfigured = false;
         boolean hasRemoteViaUPnP = false;
 
-        int pPort = 0;
+        int preferPort = 0;
         for (Device remoteDevice : remoteMilightDevices) {
 
             if (addressMac.equals(remoteDevice.addrMAC)) {
 
                 hasRemoteConnectionConfigured = true;
                 hasRemoteViaUPnP = remoteDevice.isUPnP;
-                pPort = remoteDevice.addrPort;
+                preferPort = remoteDevice.addrPort;
 
                 break;
 
@@ -386,7 +386,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
         }
 
-        final int preferredPort = pPort;
+        final int preferredPort = preferPort;
 
         /* We already have this device saved as a UPnP connection - Make sure to update lease */
         if (hasRemoteViaUPnP) {
@@ -420,7 +420,7 @@ public class MainActivity extends PreferenceActivityCompat {
                         } else {
 
                             /* Already have a mapped port; Renew UPnP lease */
-                            Log.e("RENEW LEASE", PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
+                            Log.e("RENEW LEASE", PortMapper.mapPort("", preferredPort != 0 ? preferredPort : mappedPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
 
                         }
 
