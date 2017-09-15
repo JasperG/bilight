@@ -6,19 +6,18 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaspergoes.bilight.helpers.Constants;
-import com.jaspergoes.bilight.helpers.PortMapper;
 import com.jaspergoes.bilight.helpers.PreferenceActivityCompat;
 import com.jaspergoes.bilight.helpers.PreferenceCategoryCompat;
 import com.jaspergoes.bilight.helpers.PreferenceCompat;
@@ -88,7 +87,7 @@ public class MainActivity extends PreferenceActivityCompat {
             t += device.addrIP;
 
             this.setTitle(t);
-            this.setSummary(device.addrMAC + (device.addrPort != Controller.defaultMilightPort || device.isUPnP ? " ( " + getString(R.string.port) + ": " + device.addrPort + " " + (device.isUPnP ? "| UPnP " : "") + ")" : ""));
+            this.setSummary(device.addrMAC + (device.addrPort != Controller.defaultMilightPort ? " ( " + getString(R.string.port) + ": " + device.addrPort + " )" : ""));
 
         }
 
@@ -99,19 +98,15 @@ public class MainActivity extends PreferenceActivityCompat {
 
                 final Device device = remoteMilightDevices.get(deviceIndex);
 
-                if (device.isUPnP) {
+                /* Prefer local connection if on discovered list */
+                int l = Controller.milightDevices.size();
+                for (int i = 0; i < l; i++) {
 
-                    int l = Controller.milightDevices.size();
+                    if (device.addrMAC.equals(Controller.milightDevices.get(i).addrMAC)) {
 
-                    for (int i = 0; i < l; i++) {
+                        connectLocal(i);
 
-                        if (device.addrMAC.equals(Controller.milightDevices.get(i).addrMAC)) {
-
-                            connectLocal(i);
-
-                            return;
-
-                        }
+                        return;
 
                     }
 
@@ -124,7 +119,7 @@ public class MainActivity extends PreferenceActivityCompat {
                     @Override
                     public void run() {
 
-                        Controller.INSTANCE.setDevice(device.addrIP, device.addrPort, device.isUPnP, getApplicationContext());
+                        Controller.INSTANCE.setDevice(device.addrIP, device.addrPort, getApplicationContext());
 
                     }
 
@@ -194,11 +189,8 @@ public class MainActivity extends PreferenceActivityCompat {
 
     private static ArrayList<Device> remoteMilightDevices = new ArrayList<Device>();
 
-    private FirebaseAnalytics mFirebaseAnalytics;
-
     private PreferenceCategoryCompat deviceList;
     private PreferenceCategoryCompat remoteList;
-    private PreferenceCompat addRemote;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -210,19 +202,6 @@ public class MainActivity extends PreferenceActivityCompat {
             new Controller();
         }
 
-        if (!Controller.isConnecting) {
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    Controller.INSTANCE.discoverNetworks(getApplicationContext());
-                }
-
-            }).start();
-        }
-
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
         // Root
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
 
@@ -233,25 +212,8 @@ public class MainActivity extends PreferenceActivityCompat {
         // Remote Device Category
         remoteList = new PreferenceCategoryCompat(this);
         remoteList.setOrderingAsAdded(true);
-        remoteList.setTitle(getString(R.string.remote_devices));
+        remoteList.setTitle(getString(R.string.saved_devices));
         root.addPreference(remoteList);
-
-        addRemote = new PreferenceCompat(this);
-        addRemote.setTitle(getString(R.string.add_remote_device));
-        addRemote.setSummary(getString(R.string.add_remote_device_summary));
-        addRemote.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-
-                startActivity(new Intent(getApplicationContext(), AddRemoteActivity.class));
-
-                return true;
-
-            }
-
-        });
-        remoteList.addPreference(addRemote);
 
         setPreferenceScreen(root);
         setContentView(R.layout.activity_main);
@@ -299,17 +261,49 @@ public class MainActivity extends PreferenceActivityCompat {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menuitem_discover:
+                if (!Controller.isConnecting) {
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            Controller.INSTANCE.discoverNetworks(getApplicationContext());
+                        }
+
+                    }).start();
+                }
+                return true;
+            case R.id.menuitem_addremote:
+                if (!Controller.isConnecting) {
+                    startActivity(new Intent(getApplicationContext(), AddRemoteActivity.class));
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void updateList() {
 
         boolean maySelect = !Controller.isConnecting;
         int i, l;
 
-        findViewById(R.id.busy).setVisibility(maySelect ? View.GONE : View.VISIBLE);
-        addRemote.setEnabled(maySelect);
+        // set animation!
 
         /* Remove all discovered devices from the PreferenceGroup */
         deviceList.removeAll();
-        deviceList.setTitle(getString(R.string.local_devices) + (Controller.networkInterfaceName.length() > 0 ? " - " + Controller.networkInterfaceName : ""));
+        deviceList.setTitle(getString(R.string.discovered_devices)); // + (Controller.networkInterfaceName.length() > 0 ? " - " + Controller.networkInterfaceName : ""));
 
         /* Re-populate the list with discovered devices */
         if ((l = Controller.milightDevices.size()) > 0) {
@@ -321,14 +315,14 @@ public class MainActivity extends PreferenceActivityCompat {
             }
         } else {
             PreferenceCompat pref = new PreferenceCompat(this);
-            pref.setTitle(getString(R.string.no_milight_devices_found));
+            pref.setTitle(getString(R.string.no_devices_discovered));
             pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
             pref.setEnabled(false);
             deviceList.addPreference(pref);
         }
 
         /* Remove all remote devices from the PreferenceGroup */
-        for (i = remoteList.getPreferenceCount() - 1; i > 0; i--) {
+        for (i = remoteList.getPreferenceCount() - 1; i >= 0; i--) {
             remoteList.removePreference(remoteList.getPreference(i));
         }
         remoteMilightDevices.clear();
@@ -339,7 +333,7 @@ public class MainActivity extends PreferenceActivityCompat {
             JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
             for (i = 0; i < remoteArray.length(); i++) {
                 JSONObject remote = remoteArray.getJSONObject(i);
-                remoteMilightDevices.add(new Device(remote.getString("n"), remote.getString("m"), remote.getInt("p"), remote.optBoolean("u", false)));
+                remoteMilightDevices.add(new Device(remote.getString("n"), remote.getString("m"), remote.getInt("p")));
                 RemoteDevicePreference pref = new RemoteDevicePreference(this, i);
                 pref.setIcon(getResources().getDrawable(findBoxResource(remoteMilightDevices.get(i).addrMAC)));
                 pref.setEnabled(maySelect);
@@ -347,13 +341,6 @@ public class MainActivity extends PreferenceActivityCompat {
             }
         } catch (JSONException e) {
             prefs.edit().putString("remotes", "[]").apply();
-        }
-
-        if (mFirebaseAnalytics != null) {
-            Bundle params = new Bundle();
-            params.putInt("local", Controller.milightDevices.size());
-            params.putInt("remote", remoteMilightDevices.size());
-            mFirebaseAnalytics.logEvent("device_list", params);
         }
 
     }
@@ -365,136 +352,18 @@ public class MainActivity extends PreferenceActivityCompat {
         Device device = Controller.milightDevices.get(deviceIndex);
 
         final String addressIP = device.addrIP;
-        final String addressMac = device.addrMAC;
         final int addressPort = device.addrPort;
 
-        boolean hasRemoteConnectionConfigured = false;
-        boolean hasRemoteViaUPnP = false;
+        new Thread(new Runnable() {
 
-        int preferPort = 0;
-        for (Device remoteDevice : remoteMilightDevices) {
+            @Override
+            public void run() {
 
-            if (addressMac.equals(remoteDevice.addrMAC)) {
-
-                hasRemoteConnectionConfigured = true;
-                hasRemoteViaUPnP = remoteDevice.isUPnP;
-                preferPort = remoteDevice.addrPort;
-
-                break;
+                Controller.INSTANCE.setDevice(addressIP, addressPort, getApplicationContext());
 
             }
 
-        }
-
-        final int preferredPort = preferPort;
-
-        /* We already have this device saved as a UPnP connection - Make sure to update lease */
-        if (hasRemoteViaUPnP) {
-
-            /* Renew lease -> Connect locally */
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    /* Connect locally */
-                    Controller.INSTANCE.setDevice(addressIP, addressPort, false, getApplicationContext());
-
-                    /* Try renewing UPnP lease */
-                    String outerIP = PortMapper.getExternalIP();
-
-                    if (outerIP != null) {
-
-                        int mappedPort = PortMapper.checkMapped(addressIP);
-
-                        if (mappedPort == -1) {
-
-                            /* No mapped port yet (or, any more) */
-                            /* Remote entry should, perhaps, be removed here */
-                            if (preferredPort != 0) {
-
-                                Log.e("RESET LEASE", PortMapper.mapPort("", preferredPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
-
-                            }
-
-                        } else {
-
-                            /* Already have a mapped port; Renew UPnP lease */
-                            Log.e("RENEW LEASE", PortMapper.mapPort("", preferredPort != 0 ? preferredPort : mappedPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
-
-                        }
-
-                    }
-
-                }
-
-            }).start();
-
-        } else if (hasRemoteConnectionConfigured) {
-
-            /* No need to renew lease, is not UPnP -> Connect locally */
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    Controller.INSTANCE.setDevice(addressIP, addressPort, false, getApplicationContext());
-
-                }
-
-            }).start();
-
-        } else {
-
-            /* No remote connection configured -> Attempt UPnP mapping, connect remotely */
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    /* Try UPnP approach */
-                    String outerIP = PortMapper.getExternalIP();
-
-                    if (outerIP != null) {
-
-                        int mappedPort = PortMapper.checkMapped(addressIP);
-
-                        if (mappedPort == -1) {
-
-                            /* No mapped port yet */
-                            mappedPort = 5000 + (int) (Math.random() * 1999);
-
-                            if (PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac)) {
-
-                                /* Created an upnp mapping. Great. Connect via external, to add it to the list. */
-                                Controller.INSTANCE.setDevice(outerIP, mappedPort, true, getApplicationContext());
-
-                                return;
-
-                            }
-
-                        } else {
-
-                            /* Already have a mapped port; Renew UPnP lease */
-                            Log.e("RENEW LEASE", PortMapper.mapPort("", mappedPort, addressIP, addressPort, "Milight iBox " + addressMac) ? "YES" : "NO");
-
-                            /* We already have a mapped port. Great. Connect via external, to add it to the list. */
-                            Controller.INSTANCE.setDevice(outerIP, mappedPort, true, getApplicationContext());
-
-                            return;
-
-                        }
-
-                    }
-
-                    /* Fallback, failure; Could not create upnp mapping; Use local */
-                    Controller.INSTANCE.setDevice(addressIP, addressPort, false, getApplicationContext());
-
-                }
-
-            }).start();
-
-        }
+        }).start();
 
         updateList();
 

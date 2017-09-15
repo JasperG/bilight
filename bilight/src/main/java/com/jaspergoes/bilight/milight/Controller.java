@@ -239,7 +239,7 @@ public class Controller {
                             }
                         }
 
-                        milightDevices.add(new Device(discovery[0], discovery[1].replaceAll("(.{2})", "$1" + ':').substring(0, 17), defaultMilightPort, false));
+                        milightDevices.add(new Device(discovery[0], discovery[1].replaceAll("(.{2})", "$1" + ':').substring(0, 17), defaultMilightPort));
                         Collections.sort(milightDevices);
                         context.sendBroadcast(new Intent(Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED));
 
@@ -255,7 +255,7 @@ public class Controller {
 
     }
 
-    public void setDevice(String address, int port, boolean upnp, Context context) {
+    public void setDevice(String address, int port, Context context) {
 
         isConnecting = true;
 
@@ -296,7 +296,7 @@ public class Controller {
 
         }
 
-        Log.e("BILIGHT", "LOCAL SOCKET BOUND TO: " + socket.getLocalAddress().getHostAddress());
+        Log.e("BILIGHT", "SOCKET BOUND TO: " + socket.getLocalAddress().getHostAddress());
 
         try {
 
@@ -326,14 +326,20 @@ public class Controller {
             for (int i = 0; i < 2; i++) {
 
                 try {
+
                     socket.send(new DatagramPacket(payload, payload.length, addr, defaultMilightPort));
-                    Log.e("BILIGHT", "BROADCAST SENT ONTO ADDR " + addr.getHostAddress());
-                    Thread.sleep(150);
+                    Log.e("BILIGHT", "BROADCAST SENT ON " + addr.getHostAddress());
+                    Thread.sleep(50);
+
                 } catch (IOException e) {
-                    i = 2;
+
                     Log.e("BILIGHT", "BROADCAST ADDR " + addr.getHostAddress() + " IOEXCEPTION " + e.toString());
+                    break;
+
                 } catch (InterruptedException e) {
+
                     /* Will never happen unless app destroyed */
+
                 }
 
             }
@@ -384,7 +390,7 @@ public class Controller {
 
                             String hostAddr = milightAddress.getHostAddress();
 
-                        /* Check if this is a local device */
+                            /* Check if this is a local device */
                             boolean found = false;
                             for (int i = 0; i < milightDevices.size(); i++) {
                                 if (milightDevices.get(i).addrIP.equals(hostAddr)) {
@@ -394,7 +400,7 @@ public class Controller {
                                 }
                             }
 
-                        /* Remote device */
+                            /* Remote device */
                             if (!found) {
 
                                 String hostMac = bytesToHex(buffer, packet.getLength()).substring(14, 14 + 12).replaceAll("(.{2})", "$1" + ':').substring(0, 17);
@@ -427,7 +433,6 @@ public class Controller {
                                         n.put("n", hostAddr);
                                         n.put("m", hostMac);
                                         n.put("p", milightPort);
-                                        n.put("u", upnp);
                                         remoteArray.put(n);
 
                                         changed = true;
@@ -451,7 +456,7 @@ public class Controller {
                             milightSessionByte1 = buffer[19];
                             milightSessionByte2 = buffer[20];
 
-					    /* Discover password bytes before setting isConnected to true */
+					        /* Discover password bytes before setting isConnected to true */
                             passwordDiscovery();
 
                             isConnected = true;
@@ -460,19 +465,22 @@ public class Controller {
                             context.sendBroadcast(new Intent(Constants.BILIGHT_DEVICE_CONNECTED));
 
                         } else {
+
                             Log.e("BILIGHT", "PACKET RECEIVED UNEXPECTED CONTENT");
                             Log.e("BILIGHT", "ADDRESS: " + packet.getAddress().getHostAddress());
                             Log.e("BILIGHT", "PORT: " + packet.getPort());
                             Log.e("BILIGHT", "PAYLOAD: " + bytesToHex(buffer, packet.getLength()).replaceAll("(.{2})", "$1" + ' '));
+
                         }
 
                     } else {
+
                         Log.e("BILIGHT", "PACKET RECEIVED FROM UNEXPECTED ADDRESS");
                         Log.e("BILIGHT", "ADDRESS: " + packet.getAddress().getHostAddress());
                         Log.e("BILIGHT", "PORT: " + packet.getPort());
                         Log.e("BILIGHT", "PAYLOAD: " + bytesToHex(buffer, packet.getLength()).replaceAll("(.{2})", "$1" + ' '));
-                    }
 
+                    }
 
                 } catch (IOException e) {
 

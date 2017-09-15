@@ -41,7 +41,7 @@ public class ScrollViewPlus extends ScrollView {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         // Don't do anything with intercepted touch events if we are not scrollable
-        return mScrollable ? super.onInterceptTouchEvent(ev) : false;
+        return mScrollable && super.onInterceptTouchEvent(ev);
     }
 
 }

@@ -1,23 +1,16 @@
 package com.jaspergoes.bilight.helpers;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RadialGradient;
-import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.jaspergoes.bilight.R;
 import com.jaspergoes.bilight.milight.Controller;
 
 public class ColorPickerView extends View {
@@ -94,30 +87,32 @@ public class ColorPickerView extends View {
 
     private int calculateMaximumHeight(Context context) {
 
-        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+/*        Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 
-        /* Never bigger than width or height of display ..
-         * Intentionally using deprecated methods to keep backward compatibility with android versions < 4.0 */
+        *//* Never bigger than width or height of display ..
+         * Intentionally using deprecated methods to keep backward compatibility with android versions < 4.0 *//*
         int height = Math.min(display.getWidth(), display.getHeight());
 
-        /* Minus the height of the actionbar .. */
+        *//* Minus the height of the actionbar .. *//*
         TypedArray a = context.obtainStyledAttributes((new TypedValue()).data, new int[]{R.attr.actionBarSize});
         height -= a.getDimensionPixelSize(0, 0);
         a.recycle();
 
         Resources resources = context.getResources();
 
-        /* Minus the height of the status bar, where applicable .. */
+        *//* Minus the height of the status bar, where applicable .. *//*
         int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             height -= resources.getDimensionPixelSize(resourceId);
         }
 
-        /* Minus the top and bottom padding of parent layout combined */
+        *//* Minus the top and bottom padding of parent layout combined *//*
         height -= (int) (resources.getDimension(R.dimen.activity_vertical_margin) * 2);
 
-        /* Return the maximum height of our ColorPickerView */
-        return height;
+        *//* Return the maximum height of our ColorPickerView *//*
+        return height;*/
+
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
 
     }
 
@@ -125,8 +120,10 @@ public class ColorPickerView extends View {
     protected void onDraw(Canvas canvas) {
 
         canvas.translate(CENTER, CENTER);
+        mShadowPaint.setColor(0x55000000);
         canvas.drawCircle(0, 0, CENTER, mShadowPaint);
         canvas.drawCircle(0, 0, FULL_RADIUS, mRadialPaint);
+        mShadowPaint.setColor(0xff000000);
         canvas.drawCircle(0, 0, CENTER_RADIUS + 2, mShadowPaint);
         canvas.drawCircle(0, 0, CENTER_RADIUS, mCenterPaint);
 
@@ -219,9 +216,6 @@ public class ColorPickerView extends View {
 
         /* Set the radius of the color spectrum to draw */
         FULL_RADIUS = size / 2;
-
-        /* Set the shader for the shadow around the ColorPickerView now we know it's size */
-        mShadowPaint.setShader(new RadialGradient(0, 0, CENTER, new int[]{0xff000000, 0x00000000}, new float[]{((float) FULL_RADIUS / (float) CENTER), 1f}, Shader.TileMode.MIRROR));
 
         /* Set the radius of the inner selected color to draw */
         CENTER_RADIUS = (int) (0.28 * size);

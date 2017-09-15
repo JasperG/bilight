@@ -14,10 +14,12 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -209,15 +211,16 @@ public class ControlActivity extends AppCompatActivity {
 
         ((ImageView) findViewById(R.id.ibox_icon)).setImageResource(iBoxSettings.hasIBoxLamp ? R.drawable.ic_ibox : R.drawable.ic_ibox2);
 
+        EditText connect_title = (EditText) findViewById(R.id.connect_title);
         if (iBoxSettings.title.trim().equals("")) {
-            ((EditText) findViewById(R.id.connect_title)).setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-            ((EditText) findViewById(R.id.connect_title)).setCursorVisible(true);
+            connect_title.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+            connect_title.setCursorVisible(true);
         } else {
-            ((EditText) findViewById(R.id.connect_title)).setInputType(InputType.TYPE_NULL);
+            connect_title.setInputType(InputType.TYPE_NULL);
         }
 
-        ((EditText) findViewById(R.id.connect_title)).setText(iBoxSettings.title);
-        ((EditText) findViewById(R.id.connect_title)).setOnClickListener(new View.OnClickListener() {
+        connect_title.setText(iBoxSettings.title);
+        connect_title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 EditText v = (EditText) view;
@@ -226,7 +229,7 @@ public class ControlActivity extends AppCompatActivity {
                 v.requestFocus();
             }
         });
-        ((EditText) findViewById(R.id.connect_title)).addTextChangedListener(new TextWatcher() {
+        connect_title.addTextChangedListener(new TextWatcher() {
 
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -244,6 +247,33 @@ public class ControlActivity extends AppCompatActivity {
                 iBoxSettings.title = t;
                 iBoxSettings.save(getApplicationContext(), Controller.milightMac);
                 getSupportActionBar().setTitle(t.equals("") ? "Bilight" : t + " | Bilight");
+            }
+
+        });
+        connect_title.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+
+                if ((actionId == EditorInfo.IME_ACTION_DONE)) {
+
+                    ((EditText) findViewById(R.id.connect_title)).setText(iBoxSettings.title.trim());
+
+                    View v = ControlActivity.this.getCurrentFocus();
+                    if (v != null) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        v.clearFocus();
+                    }
+
+                    if (!iBoxSettings.title.trim().equals("")) {
+                        ((EditText) findViewById(R.id.connect_title)).setInputType(InputType.TYPE_NULL);
+                    }
+
+                }
+
+                return false;
+
             }
 
         });

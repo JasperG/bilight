@@ -3,12 +3,9 @@
 
     <string name="ipaddress_hostname">IP-adres / Hostnaam</string>
     <string name="connect">Verbinden</string>
-    <string name="local_devices">Lokale Apparaten</string>
-    <string name="remote_devices">Apparaten op Afstand</string>
-    <string name="add_remote_device">Apparaat op Afstand toevoegen</string>
-    <string name="add_remote_device_summary">Handmatig een IP-adres en Poort invullen om op afstand te verbinden met een Milight apparaat.</string>
-    <string name="remote_instructions">Om dit te gebruiken, moeten UDP pakketten op de router worden doorgestuurd naar het lokale IP-adres van de Milight iBox1 of iBox2 op poort 5987.\nFor now; After pressing the "Connect" button, the connection will be saved to the list *only* if a connection could be established.</string>
-    <string name="discover_attempt">Even geduld. Ontdekking, of, poging tot connectie wordt uitgevoerd.\nMax 12 seconden wachten tot een iBox reageert.</string>
+    <string name="discovered_devices">Ontdekte Apparaten</string>
+    <string name="saved_devices">Opgeslagen Apparaten</string>
+    <string name="remote_instructions">Enter the IP address of your Milight hub (iBox).\n\nTo access lights from mobile networks, you need to enter the external IP address of your router, and forward incoming UDP packets on your router to the local IP address of your Milight hub at port 5987.\n\nIf a connection can be established as a result of the details you enter here, the connection will be saved for later use.</string>
     <string name="ip_local_warn">The IP address you entered apppears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
     <string name="colortemp">Wit Temperatuur</string>
     <string name="rgbw">RGBW</string>
@@ -38,6 +35,8 @@
     <string name="zones">Zones</string>
     <string name="white">Wit</string>
     <string name="help">Help</string>
+    <string name="discover">Discover</string>
     <string name="via">via</string>
-    <string name="no_milight_devices_found">Geen Milight apparaten gevonden.</string>
+    <string name="no_devices_discovered">Geen Milight apparaten gevonden.</string>
+    <string name="add_manually">Apparaat Toevoegen</string>
 </resources>

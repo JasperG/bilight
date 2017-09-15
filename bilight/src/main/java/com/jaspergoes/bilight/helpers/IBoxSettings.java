@@ -2,10 +2,8 @@ package com.jaspergoes.bilight.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.jaspergoes.bilight.milight.Controller;
 
 import org.json.JSONArray;
@@ -57,18 +55,6 @@ public class IBoxSettings {
 
             prefs.edit().putString("devices", "[]").apply();
 
-        }
-
-        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
-        if (mFirebaseAnalytics != null) {
-            Bundle params = new Bundle();
-            params.putString("mac", key);
-            params.putString("title", title);
-            params.putString("has_lamp", hasIBoxLamp ? "yes" : "no");
-            params.putString("has_rgbw", hasRGBW ? "yes" : "no");
-            params.putString("has_rgbww", hasRGBWW ? "yes" : "no");
-            params.putString("has_dualw", hasDualW ? "yes" : "no");
-            mFirebaseAnalytics.logEvent("device_connect", params);
         }
 
         /* On load; Propagate to Controller */

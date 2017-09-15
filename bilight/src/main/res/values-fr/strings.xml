@@ -3,12 +3,9 @@
 
     <string name="ipaddress_hostname">IP address / Hostname</string>
     <string name="connect">Connect</string>
-    <string name="local_devices">Local Devices</string>
-    <string name="remote_devices">Remote Devices</string>
-    <string name="add_remote_device">Add Remote Device</string>
-    <string name="add_remote_device_summary">Specify an IP address and Port to connect to a Milight device remotely.</string>
-    <string name="remote_instructions">To use this, you need to forward incoming UDP packets on your router to the local IP address of your Milight iBox1 or iBox2 at port 5987.\nFor now; After pressing the "Connect" button, the connection will be saved to the list *only* if a connection could be established.</string>
-    <string name="discover_attempt">Please wait. Discovering, or, attempting connection..\nMax 12 seconds for an iBox to respond.</string>
+    <string name="discovered_devices">Discovered Devices</string>
+    <string name="saved_devices">Saved Devices</string>
+    <string name="remote_instructions">Enter the IP address of your Milight hub (iBox).\n\nTo access lights from mobile networks, you need to enter the external IP address of your router, and forward incoming UDP packets on your router to the local IP address of your Milight hub at port 5987.\n\nIf a connection can be established as a result of the details you enter here, the connection will be saved for later use.</string>
     <string name="ip_local_warn">The IP address you entered apppears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
     <string name="colortemp">White Temperature</string>
     <string name="rgbw">RGBW</string>
@@ -38,6 +35,8 @@
     <string name="zones">Zones</string>
     <string name="white">Blanc</string>
     <string name="help">Dider</string>
+    <string name="discover">Discover</string>
     <string name="via">via</string>
-    <string name="no_milight_devices_found">Aucun appareil Milight trouvé.</string>
+    <string name="no_devices_discovered">Aucun appareil Milight trouvé.</string>
+    <string name="add_manually">Add Device</string>
 </resources>

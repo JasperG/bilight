@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuitem_addremote"
+        android:icon="@drawable/ic_plus_circle_outline"
+        android:orderInCategory="0"
+        android:title="@string/add_manually"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menuitem_discover"
+        android:icon="@drawable/ic_autorenew"
+        android:orderInCategory="1"
+        android:title="@string/discover"
+        app:showAsAction="always" />
+
+</menu>

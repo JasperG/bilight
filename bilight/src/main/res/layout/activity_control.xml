@@ -138,6 +138,7 @@
                                 android:id="@+id/control_zone_1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:text="@string/zone_1"
                                 app:buttonTint="@color/colorPrimary" />
 
@@ -145,6 +146,7 @@
                                 android:id="@+id/control_zone_2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:text="@string/zone_2"
                                 app:buttonTint="@color/colorPrimary" />
 
@@ -152,6 +154,7 @@
                                 android:id="@+id/control_zone_3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
                                 android:text="@string/zone_3"
                                 app:buttonTint="@color/colorPrimary" />
 
