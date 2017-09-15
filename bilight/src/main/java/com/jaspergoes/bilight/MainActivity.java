@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.provider.Settings;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -125,7 +127,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
                 }).start();
 
-                updateList();
+                updateList(false);
 
             }
 
@@ -154,7 +156,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
                 }
 
-                updateList();
+                updateList(false);
 
                 return true;
 
@@ -175,7 +177,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
             if (Constants.BILIGHT_DISCOVERED_DEVICES_CHANGED.equals(action)) {
 
-                updateList();
+                updateList(false);
 
             } else if (Constants.BILIGHT_DEVICE_CONNECTED.equals(action)) {
 
@@ -192,6 +194,22 @@ public class MainActivity extends PreferenceActivityCompat {
     private PreferenceCategoryCompat deviceList;
     private PreferenceCategoryCompat remoteList;
 
+    public static boolean isFinishActivitiesOptionEnabled(Context context) {
+
+        int result;
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            result = Settings.System.getInt(context.getContentResolver(), Settings.System.ALWAYS_FINISH_ACTIVITIES, 0);
+        } else {
+            result = Settings.Global.getInt(context.getContentResolver(), Settings.Global.ALWAYS_FINISH_ACTIVITIES, 0);
+        }
+
+        return result == 1;
+
+    }
+
+    private boolean autoConnect = false;
+
     @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle bundle) {
@@ -201,6 +219,8 @@ public class MainActivity extends PreferenceActivityCompat {
         if (Controller.INSTANCE == null) {
             new Controller();
         }
+
+        autoConnect = true;
 
         // Root
         PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
@@ -245,7 +265,8 @@ public class MainActivity extends PreferenceActivityCompat {
         filter.addAction(Constants.BILIGHT_DEVICE_CONNECTED);
         registerReceiver(receiver, filter);
 
-        updateList();
+        updateList(autoConnect && !isFinishActivitiesOptionEnabled(getApplicationContext()));
+        autoConnect = false;
 
     }
 
@@ -294,7 +315,7 @@ public class MainActivity extends PreferenceActivityCompat {
         }
     }
 
-    private void updateList() {
+    private void updateList(boolean connectIfOnlyOneSaved) {
 
         boolean maySelect = !Controller.isConnecting;
         int i, l;
@@ -353,6 +374,26 @@ public class MainActivity extends PreferenceActivityCompat {
             remoteList.addPreference(pref);
         }
 
+        if (connectIfOnlyOneSaved && remoteMilightDevices.size() == 1) {
+
+            final Device device = remoteMilightDevices.get(0);
+            Controller.isConnecting = true;
+
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    Controller.INSTANCE.setDevice(device.addrIP, device.addrPort, getApplicationContext());
+
+                }
+
+            }).start();
+
+            updateList(false);
+
+        }
+
     }
 
     private void connectLocal(int deviceIndex) {
@@ -375,7 +416,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
         }).start();
 
-        updateList();
+        updateList(false);
 
     }
 

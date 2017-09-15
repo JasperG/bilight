@@ -210,10 +210,10 @@ public class Controller {
 			/* Note:
              * We'll spend four seconds waiting for the first device to answer.
 			 * We'll spend no more than two seconds once the first device has been found.
-			 * If there's been no answer after four seconds, we'll retry the whole thing, twice.
-			 * That makes max 12 seconds for discovery. */
+			 * If there's been no answer after four seconds, we'll retry the whole thing.
+			 * That makes max 8 seconds for discovery. */
 
-			/* Keep listening for incoming packets for at least four seconds, or eight while no devices are found */
+			/* Keep listening for incoming packets for at least two seconds, or four while no devices are found */
             long timeout = System.currentTimeMillis();
 
             discoveryLoop:
@@ -251,7 +251,7 @@ public class Controller {
             while (System.currentTimeMillis() - timeout < (milightDevices.size() == 0 ? 4000 : 2000));
 
         }
-        while (milightDevices.size() == 0 && ++attempts < 3);
+        while (milightDevices.size() == 0 && ++attempts < 2);
 
     }
 
