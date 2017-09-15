@@ -39,4 +39,5 @@
     <string name="via">vía</string>
     <string name="no_devices_discovered">No se han encontrado dispositivos Milight.</string>
     <string name="add_manually">Add Device</string>
+    <string name="no_devices_saved">No Milight devices saved.</string>
 </resources>

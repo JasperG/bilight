@@ -390,66 +390,53 @@ public class Controller {
 
                             String hostAddr = milightAddress.getHostAddress();
 
-                            /* Check if this is a local device */
+                            /* Check if this device is already saved */
+                            String hostMac = bytesToHex(buffer, packet.getLength()).substring(14, 14 + 12).replaceAll("(.{2})", "$1" + ':').substring(0, 17);
+                            milightMac = hostMac;
+                            boolean changed = false;
+
                             boolean found = false;
-                            for (int i = 0; i < milightDevices.size(); i++) {
-                                if (milightDevices.get(i).addrIP.equals(hostAddr)) {
-                                    milightMac = milightDevices.get(i).addrMAC;
-                                    found = true;
-                                    break;
-                                }
-                            }
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                            try {
 
-                            /* Remote device */
-                            if (!found) {
+                                JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
+                                for (int i = 0; i < remoteArray.length(); i++) {
+                                    JSONObject remote = remoteArray.getJSONObject(i);
+                                    if (remote.getString("n").equals(hostAddr) && remote.optInt("p", -1) == milightPort) {
 
-                                String hostMac = bytesToHex(buffer, packet.getLength()).substring(14, 14 + 12).replaceAll("(.{2})", "$1" + ':').substring(0, 17);
-                                milightMac = hostMac;
-                                boolean changed = false;
-
-                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                                try {
-
-                                    JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
-                                    for (int i = 0; i < remoteArray.length(); i++) {
-                                        JSONObject remote = remoteArray.getJSONObject(i);
-                                        if (remote.getString("n").equals(hostAddr) && remote.optInt("p", -1) == milightPort) {
-
-                                            if (!remote.optString("m", "").equals(hostMac)) {
-                                                remote.put("m", hostMac);
-                                                remoteArray.put(i, remote);
-                                                changed = true;
-                                            }
-
-                                            found = true;
-                                            break;
-
+                                        if (!remote.optString("m", "").equals(hostMac)) {
+                                            remote.put("m", hostMac);
+                                            remoteArray.put(i, remote);
+                                            changed = true;
                                         }
-                                    }
 
-                                    if (!found) {
-
-                                        JSONObject n = new JSONObject();
-                                        n.put("n", hostAddr);
-                                        n.put("m", hostMac);
-                                        n.put("p", milightPort);
-                                        remoteArray.put(n);
-
-                                        changed = true;
+                                        found = true;
+                                        break;
 
                                     }
+                                }
 
-                                    if (changed) {
+                                if (!found) {
 
-                                        prefs.edit().putString("remotes", remoteArray.toString()).apply();
+                                    JSONObject n = new JSONObject();
+                                    n.put("n", hostAddr);
+                                    n.put("m", hostMac);
+                                    n.put("p", milightPort);
+                                    remoteArray.put(n);
 
-                                    }
-
-                                } catch (JSONException e) {
-
-                                    prefs.edit().putString("remotes", "[]").apply();
+                                    changed = true;
 
                                 }
+
+                                if (changed) {
+
+                                    prefs.edit().putString("remotes", remoteArray.toString()).apply();
+
+                                }
+
+                            } catch (JSONException e) {
+
+                                prefs.edit().putString("remotes", "[]").apply();
 
                             }
 

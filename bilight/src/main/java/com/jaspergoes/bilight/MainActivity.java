@@ -329,6 +329,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
         /* Re-populate the list of remote devices from sharedpreferences */
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean any = false;
         try {
             JSONArray remoteArray = new JSONArray(prefs.getString("remotes", "[]"));
             for (i = 0; i < remoteArray.length(); i++) {
@@ -338,9 +339,18 @@ public class MainActivity extends PreferenceActivityCompat {
                 pref.setIcon(getResources().getDrawable(findBoxResource(remoteMilightDevices.get(i).addrMAC)));
                 pref.setEnabled(maySelect);
                 remoteList.addPreference(pref);
+                any = true;
             }
         } catch (JSONException e) {
             prefs.edit().putString("remotes", "[]").apply();
+        }
+
+        if (!any) {
+            PreferenceCompat pref = new PreferenceCompat(this);
+            pref.setTitle(getString(R.string.no_devices_saved));
+            pref.setIcon(getResources().getDrawable(R.drawable.ic_ibox));
+            pref.setEnabled(false);
+            remoteList.addPreference(pref);
         }
 
     }
