@@ -28,10 +28,6 @@
     <string name="on">On</string>
     <string name="off">Off</string>
     <string name="wifi_bridge">iBox</string>
-    <string name="zone_1">1</string>
-    <string name="zone_2">2</string>
-    <string name="zone_3">3</string>
-    <string name="zone_4">4</string>
     <string name="zones">Zones</string>
     <string name="white">White</string>
     <string name="help">Help</string>
@@ -40,4 +36,5 @@
     <string name="no_devices_discovered">No Milight devices discovered.</string>
     <string name="add_manually">Add Device</string>
     <string name="no_devices_saved">No Milight devices saved.</string>
+    <string name="translation_credits">{language} translation by {name} {email}</string>
 </resources>
