@@ -6,7 +6,7 @@
     <string name="discovered_devices">Discovered Devices</string>
     <string name="saved_devices">Saved Devices</string>
     <string name="remote_instructions">Enter the IP address of your Milight hub (iBox).\n\nTo access lights from mobile networks, you need to enter the external IP address of your router, and forward incoming UDP packets on your router to the local IP address of your Milight hub at port 5987.\n\nIf a connection can be established as a result of the details you enter here, the connection will be saved for later use.</string>
-    <string name="ip_local_warn">The IP address you entered apppears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
+    <string name="ip_local_warn">The IP address you entered appears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
     <string name="colortemp">White Temperature</string>
     <string name="rgbw">RGBW</string>
     <string name="rgbww">RGBWW</string>
