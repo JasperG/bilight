@@ -1,25 +1,26 @@
 <resources>
     <string name="app_name">Bilight</string>
 
-    <string name="ipaddress_hostname">IP address / Hostname</string>
-    <string name="connect">Connect</string>
-    <string name="discovered_devices">Discovered Devices</string>
-    <string name="saved_devices">Saved Devices</string>
-    <string name="remote_instructions">Enter the IP address of your Milight hub (iBox).\n\nTo access lights from mobile networks, you need to enter the external IP address of your router, and forward incoming UDP packets on your router to the local IP address of your Milight hub at port 5987.\n\nIf a connection can be established as a result of the details you enter here, the connection will be saved for later use.</string>
-    <string name="ip_local_warn">The IP address you entered appears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
-    <string name="colortemp">White Temperature</string>
+    <string name="ipaddress_hostname">IP-Adresse / Hostname</string>
+    <string name="connect">Verbindung herstellen</string>
+    <string name="discovered_devices">Gefundene Geräte</string>
+    <string name="saved_devices">Gespeicherte Geräte</string>
+    <string name="remote_instructions">Gib die IP-Adresse deines Milight-Hubs (iBox) ein.\n\nUm die Lampen auch über die mobile Datenverbindung (das Handynetz) zu erreichen, musst du die externe IP-Adresse deines Routers eingeben. Außerdem müssen die hereinkommenden UDP-Pakete von deinem Router an die lokale IP-Adresse des Milight-Hubs (üblicherweise) auf Port 5987 weitergeleitet werden.\n\nSofern eine Verbindung mithilfe der hier eingetragenen Informationen hergestellt werden kann, wird diese Verbindung für die zukünftige Nutzung gespeichert.</string>
+    <string name="ip_local_warn">Die eingegebene IP-Adresse sieht wie eine lokale IP-Adresse aus. Womöglich funktioniert sie im lokalen WLAN-Netz, allerdings wird sie nicht über die mobile Datenverbindung (das Handynetz) erreichbar sein. Um das zu gewährleisten, musst Du die externe IP-Adresse des Routers eingegeben.</string>
+ 
+    <string name="colortemp">Farbtemperatur (Weiß)</string>
     <string name="rgbw">RGBW</string>
     <string name="rgbww">RGBWW</string>
-    <string name="devices">Devices</string>
-    <string name="drawer_open">Open</string>
-    <string name="drawer_close">Close</string>
-    <string name="has_ibox_lamp">iBox lamp</string>
-    <string name="has_rgbw">RGBW bulb(s)</string>
-    <string name="has_rgbww">RGBWW bulb(s)</string>
-    <string name="has_dualw">Dual-W bulb(s)</string>
-    <string name="config_has">This Milight iBox has ..</string>
+    <string name="devices">Geräte</string>
+    <string name="drawer_open">Öffnen</string>
+    <string name="drawer_close">Schließen</string>
+    <string name="has_ibox_lamp">iBox Lampe</string>
+    <string name="has_rgbw">RGBW Birne(n)</string>
+    <string name="has_rgbww">RGBWW Birne(n)</string>
+    <string name="has_dualw">Dual-W Birne(n)</string>
+    <string name="config_has">Diese Milight iBox hat ..</string>
     <string name="dualw">Dual-W</string>
-    <string name="current_external_ip">Current IP</string>
+    <string name="current_external_ip">Aktuelle IP</string>
 
     <string name="port">Anschluss</string>
     <string name="brightness">Helligkeit</string>
@@ -31,10 +32,10 @@
     <string name="zones">Zonen</string>
     <string name="white">Weiß</string>
     <string name="help">Hilfe</string>
-    <string name="discover">Discover</string>
+    <string name="discover">Suchen</string>
     <string name="via">über</string>
     <string name="no_devices_discovered">Keine Milight-Geräte gefunden.</string>
-    <string name="add_manually">Add Device</string>
-    <string name="no_devices_saved">No Milight devices saved.</string>
-    <string name="translation_credits">{language} translation by {name} {email}</string>
+    <string name="add_manually">Gerät hinzufügen</string>
+    <string name="no_devices_saved">Keine Milight Geräte gespeichert.</string>
+    <string name="translation_credits">Deutsche Übersetzung von Marcel Jira marcel@yeara.net</string>
 </resources>
