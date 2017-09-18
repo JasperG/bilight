@@ -101,7 +101,7 @@ public class MainActivity extends PreferenceActivityCompat {
                 final Device device = remoteMilightDevices.get(deviceIndex);
 
                 /* Prefer local connection if on discovered list */
-                int l = Controller.milightDevices.size();
+                /*int l = Controller.milightDevices.size();
                 for (int i = 0; i < l; i++) {
 
                     if (device.addrMAC.equals(Controller.milightDevices.get(i).addrMAC)) {
@@ -112,7 +112,7 @@ public class MainActivity extends PreferenceActivityCompat {
 
                     }
 
-                }
+                }*/
 
                 Controller.isConnecting = true;
 
