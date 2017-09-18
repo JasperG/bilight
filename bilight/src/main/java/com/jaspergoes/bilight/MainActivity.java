@@ -310,6 +310,11 @@ public class MainActivity extends PreferenceActivityCompat {
                     startActivity(new Intent(getApplicationContext(), AddRemoteActivity.class));
                 }
                 return true;
+            case R.id.menuitem_about:
+                if (!Controller.isConnecting) {
+                    startActivity(new Intent(getApplicationContext(), AboutActivity.class));
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

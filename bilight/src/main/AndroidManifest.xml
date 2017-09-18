@@ -33,6 +33,8 @@
 
         <activity android:name="com.jaspergoes.bilight.AddRemoteActivity" />
 
+        <activity android:name="com.jaspergoes.bilight.AboutActivity" />
+
     </application>
 
 </manifest>

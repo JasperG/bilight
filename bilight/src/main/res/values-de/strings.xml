@@ -38,4 +38,6 @@
     <string name="add_manually">Gerät hinzufügen</string>
     <string name="no_devices_saved">Keine Milight Geräte gespeichert.</string>
     <string name="translation_credits">Deutsche Übersetzung von Marcel Jira marcel@yeara.net</string>
+    <string name="about">About</string>
+    <string name="special_thanks_contributors">Special thanks to contributors:\n</string>
 </resources>

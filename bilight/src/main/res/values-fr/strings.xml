@@ -36,5 +36,7 @@
     <string name="no_devices_discovered">Aucun appareil Milight trouvé.</string>
     <string name="add_manually">Add Device</string>
     <string name="no_devices_saved">No Milight devices saved.</string>
-    <string name="translation_credits">{language} translation by {name} {email}</string>
+    <string name="translation_credits">{language} translation by {name} {email} (Translation incomplete, please translate and pull on GitHub!)</string>
+    <string name="about">About</string>
+    <string name="special_thanks_contributors">Special thanks to contributors:\n</string>
 </resources>

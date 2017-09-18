@@ -7,7 +7,7 @@
     <string name="saved_devices">Opgeslagen Apparaten</string>
     <string name="remote_instructions">Enter the IP address of your Milight hub (iBox).\n\nTo access lights from mobile networks, you need to enter the external IP address of your router, and forward incoming UDP packets on your router to the local IP address of your Milight hub at port 5987.\n\nIf a connection can be established as a result of the details you enter here, the connection will be saved for later use.</string>
     <string name="ip_local_warn">The IP address you entered appears to be a local IP address, and however it may work locally, will *not* work over mobile networks. You need to enter the external IP of the router.</string>
-    <string name="colortemp">Wit Temperatuur</string>
+    <string name="colortemp">Kleurtemperatuur (Wit)</string>
     <string name="rgbw">RGBW</string>
     <string name="rgbww">RGBWW</string>
     <string name="devices">Apparaten</string>
@@ -35,6 +35,8 @@
     <string name="via">via</string>
     <string name="no_devices_discovered">Geen Milight apparaten gevonden.</string>
     <string name="add_manually">Apparaat Toevoegen</string>
-    <string name="no_devices_saved">No Milight devices saved.</string>
-    <string name="translation_credits">{language} translation by {name} {email}</string>
+    <string name="no_devices_saved">Geen Milight apparaten opgeslagen.</string>
+    <string name="translation_credits">{language} translation by {name} {email} (Translation incomplete, please translate and pull on GitHub!)</string>
+    <string name="about">About</string>
+    <string name="special_thanks_contributors">Special thanks to contributors:\n</string>
 </resources>
