@@ -3,11 +3,12 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 24
         defaultConfig {
-        applicationId "com.jaspergoes.bilight"
+        applicationId "com.itProfi.milight"
         minSdkVersion 9
-        targetSdkVersion 22
+        //noinspection OldTargetApi
+        targetSdkVersion 26
         versionCode 28
-        versionName "0.0.3"
+        versionName "0.0.1"
     }
     buildTypes {
         release {
@@ -22,5 +23,5 @@ dependencies {
     implementation project(':discreteseekbar')
     implementation 'com.android.support:support-v4:24.2.1'
     implementation 'com.android.support:appcompat-v7:24.2.1'
-    implementation 'com.google.firebase:firebase-crash:10.0.1'
+    implementation 'com.google.firebase:firebase-crash:15.0.2'
 }
